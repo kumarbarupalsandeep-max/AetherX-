@@ -13,20 +13,40 @@ import {
   Users,
   Layers,
   Headphones,
+  QrCode,
+  Smartphone,
+  Monitor,
+  CheckCircle2,
 } from 'lucide-react';
 import { useExchange } from '../context/ExchangeContext';
 import { formatPrice, formatCompactNumber } from '../data/exchangeData';
+import { CryptoIcon } from '../components/CryptoIcon';
 
 export const HomePage: React.FC = () => {
-  const { tickers, navigate, isAuthenticated, openAuthModal, balances } = useExchange();
-  const [marketTab, setMarketTab] = useState<'popular' | 'gainers' | 'volume'>('popular');
+  const {
+    tickers,
+    marketLoading,
+    marketError,
+    refreshMarkets,
+    navigate,
+    isAuthenticated,
+    openAuthModal,
+    balances,
+  } = useExchange();
+  const [marketTab, setMarketTab] = useState<'popular' | 'new' | 'gainers' | 'volume'>('popular');
   const [heroEmail, setHeroEmail] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [activePlatform, setActivePlatform] = useState<'Mobile' | 'Desktop' | 'Pro'>('Desktop');
 
   const btcTicker = tickers.find((t) => t.symbol === 'BTCUSDT') || tickers[0];
+  const btcPrice = btcTicker?.price || 0;
+  const total24hVolume = tickers.reduce((acc, t) => acc + t.quoteVolume24h, 0);
 
   const displayedTickers = React.useMemo(() => {
     const list = [...tickers];
+    if (marketTab === 'new') {
+      return list.filter((t) => ['SUI', 'RENDER', 'NEAR', 'ARB', 'AAVE', 'SOL'].includes(t.baseAsset));
+    }
     if (marketTab === 'gainers') {
       return list.sort((a, b) => b.priceChangePercent - a.priceChangePercent).slice(0, 6);
     }
@@ -40,20 +60,24 @@ export const HomePage: React.FC = () => {
 
   const faqs = [
     {
-      q: 'How does AetherX Pro protect user funds and maintain 1:1 reserves?',
-      a: 'Every account asset on AetherX Pro is backed at least 1:1 in segregated multi-signature cold storage. Users can verify their individual account inclusion at any time using our cryptographic Merkle-tree Proof of Reserves portal, alongside our $1.0B SAFU emergency protection fund.',
+      q: 'What is a cryptocurrency exchange?',
+      a: 'A cryptocurrency exchange is a digital marketplace where users can buy, sell, convert, and trade cryptocurrencies like Bitcoin (BTC), Ethereum (ETH), Tether (USDT), and Solana (SOL). AetherX Pro provides deep order book liquidity across Spot, USDⓈ-M Perpetual Futures, Zero-Fee Convert, and Escrow P2P markets.',
     },
     {
-      q: 'Can I browse markets, order books, and live charts without logging in?',
-      a: 'Yes. Over 80% of AetherX Pro — including real-time Markets, Spot & Futures candlestick terminals, Order Books, P2P merchant listings, Simple Earn APR vaults, and Airdrop snapshots — is publicly accessible without an account. Authentication is only required when placing orders, depositing, or withdrawing.',
+      q: 'What products does AetherX Pro provide?',
+      a: 'AetherX Pro offers a complete suite of digital asset products: Spot Trading (350+ pairs), USDⓈ-M Perpetual Futures (up to 125x leverage), P2P Local Fiat Trading (0% fee via UPI, IMPS, SEPA, Zelle), Instant Convert & OTC Block Trading, Simple Earn Flexible/Locked staking vaults, and Megadrop/HODLer token launch airdrops.',
     },
     {
-      q: 'What are the Spot and Futures trading fees on AetherX Pro?',
-      a: 'Regular Spot trading starts at 0.10% Maker / 0.10% Taker (with 25% discount when holding ecosystem tokens, and 0% Maker fees on USDC pairs). USDⓈ-M Perpetual Futures start at 0.02% Maker / 0.05% Taker.',
+      q: 'How to buy Bitcoin and other cryptocurrencies on AetherX Pro?',
+      a: 'You can purchase crypto in minutes using Visa/Mastercard, Apple Pay, or Bank Transfer on the Buy Crypto page, or trade directly with verified peer-to-peer merchants on the P2P Marketplace using your local currency at 0% transaction fee.',
     },
     {
-      q: 'How do I buy crypto with local currency (USD, INR, EUR, GBP)?',
-      a: 'Navigate to Buy Crypto for instant Visa/Mastercard/Apple Pay settlement, or use the P2P Trading marketplace to buy and sell USDT, BTC, and ETH directly with verified merchants via UPI, IMPS, SEPA Instant, Zelle, and bank transfer at 0% platform fee.',
+      q: 'How to track cryptocurrency prices and live order books?',
+      a: 'Visit the Markets Overview or Spot Trading Terminal at any time — no login is required to inspect live 24-hour tickers, candlestick charts, technical indicators (MA/EMA/BOLL), and real-time order book depth.',
+    },
+    {
+      q: 'How to earn passive income from crypto on AetherX Pro?',
+      a: 'Navigate to Simple Earn to subscribe your idle USDT, USDC, BTC, ETH, SOL, or BNB into Flexible or Fixed-Term vaults earning up to 11.40% APR, with automatic eligibility for HODLer Airdrop token distributions.',
     },
   ];
 
@@ -65,14 +89,14 @@ export const HomePage: React.FC = () => {
           <div className="flex items-center gap-2.5 overflow-hidden">
             <Volume2 className="w-3.5 h-3.5 text-[#F0B90B] shrink-0" />
             <span className="text-[var(--text-secondary)] truncate">
-              [Launchpool & HODLer Airdrop] Hyperion ZK (HYPR) Snapshot Live — Stake BNB or SOL in Simple Earn to Claim Rewards
+              AetherX Pro Will List Hyperion ZK (HYPR) with Seed Tag Applied & Open HODLer Airdrop Claims
             </span>
             <span className="hidden md:inline text-[var(--text-muted)]">·</span>
-            <span className="hidden md:inline text-[var(--text-muted)]">10-05</span>
+            <span className="hidden md:inline text-[var(--text-muted)] font-mono-num">2026-10-05</span>
           </div>
           <button
             onClick={() => navigate('/announcements')}
-            className="text-[#F0B90B] hover:underline font-medium shrink-0 flex items-center gap-0.5 cursor-pointer"
+            className="text-[#F0B90B] hover:underline font-semibold shrink-0 flex items-center gap-0.5 cursor-pointer"
           >
             More
             <ChevronRight className="w-3.5 h-3.5" />
@@ -80,26 +104,24 @@ export const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Split Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 lg:px-8 pt-10 pb-14 lg:py-16">
+      {/* Main Split Hero Section (Exact Binance Reference Layout) */}
+      <section className="max-w-7xl mx-auto px-4 lg:px-8 pt-8 pb-14 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          {/* Left 7 Columns: Value Prop + CTA + Quantitative Metrics */}
+          {/* Left 7 Columns: Giant User Counter + Headline + Sign-Up Input + 4 Trust Pillars */}
           <div className="lg:col-span-7 space-y-8">
-            <div className="space-y-4">
-              <div className="text-xs font-medium text-[#F0B90B] tracking-wide">
-                INSTITUTIONAL DIGITAL ASSET EXCHANGE · 1:1 PROOF OF RESERVES
+            <div className="space-y-3">
+              <div className="font-display text-4xl sm:text-6xl lg:text-[68px] font-extrabold tracking-tight leading-[1.04]">
+                <div className="text-[#F0B90B] font-mono-num">254,892,410</div>
+                <div className="text-[var(--text-primary)] mt-1">USERS TRUST US</div>
               </div>
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-[54px] font-bold tracking-tight leading-[1.08] text-[var(--text-primary)]">
-                Trade <span className="text-[#F0B90B]">350+ Cryptocurrencies</span> with Deep Institutional Liquidity
-              </h1>
-              <p className="text-base text-[var(--text-secondary)] max-w-xl leading-relaxed">
-                Execute Spot, 125x USDⓈ-M Perpetuals, Zero-Fee Conversions, and Escrow P2P settlements on an ultra-low-latency matching engine trusted globally.
+              <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-xl leading-relaxed pt-1">
+                Trade Bitcoin, Ethereum, Solana, and 350+ cryptocurrencies on the world's most liquid Spot & Perpetual Futures matching engine.
               </p>
             </div>
 
-            {/* Interactive Onboarding / Portfolio Box */}
+            {/* Interactive Onboarding Input Bar or Portfolio Summary */}
             {!isAuthenticated ? (
-              <div className="max-w-lg space-y-3">
+              <div className="max-w-lg space-y-4">
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -108,61 +130,78 @@ export const HomePage: React.FC = () => {
                   className="flex flex-col sm:flex-row gap-2.5"
                 >
                   <input
-                    type="email"
+                    type="text"
                     value={heroEmail}
                     onChange={(e) => setHeroEmail(e.target.value)}
-                    placeholder="Enter Email or Phone Number"
-                    className="flex-1 px-4 py-3.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+                    placeholder="Email / Phone number"
+                    className="flex-1 px-4 py-3.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#F0B90B]/60 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
                   />
                   <button
                     type="submit"
-                    className="px-7 py-3.5 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-semibold text-sm transition-colors whitespace-nowrap flex items-center justify-center gap-2 cursor-pointer"
+                    className="px-8 py-3.5 rounded-xl bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] font-bold text-sm transition-colors whitespace-nowrap flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    Sign Up & Claim $100
-                    <ArrowRight className="w-4 h-4" />
+                    Sign Up
                   </button>
                 </form>
-                <div className="flex flex-wrap items-center gap-4 text-xs text-[var(--text-muted)]">
-                  <span>Or continue directly to:</span>
-                  <button
-                    onClick={() => navigate('/trade/spot', 'BTCUSDT')}
-                    className="text-[var(--text-primary)] hover:text-[#F0B90B] font-medium underline underline-offset-4 cursor-pointer"
-                  >
-                    Spot Terminal (BTC/USDT)
-                  </button>
-                  <span>·</span>
-                  <button
-                    onClick={() => navigate('/markets')}
-                    className="text-[var(--text-primary)] hover:text-[#F0B90B] font-medium underline underline-offset-4 cursor-pointer"
-                  >
-                    Explore All Markets
-                  </button>
+
+                {/* Or Continue With / App QR Row */}
+                <div className="flex flex-wrap items-center gap-6 pt-2 text-xs text-[var(--text-muted)]">
+                  <div className="flex items-center gap-3">
+                    <span>Or continue with</span>
+                    <button
+                      type="button"
+                      onClick={() => openAuthModal('register')}
+                      className="px-3 py-1.5 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold cursor-pointer"
+                    >
+                      Google
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openAuthModal('register')}
+                      className="px-3 py-1.5 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold cursor-pointer"
+                    >
+                      Apple
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span>Download App</span>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/trade/spot')}
+                      className="p-1.5 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-[var(--text-primary)] cursor-pointer"
+                      title="Open Trading Terminal"
+                    >
+                      <QrCode className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] max-w-xl">
+              <div className="p-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] max-w-xl">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <div className="text-xs text-[var(--text-muted)]">Estimated Portfolio Balance</div>
+                    <div className="text-xs text-[var(--text-muted)]">Estimated Portfolio Value</div>
                     <div className="text-2xl font-bold font-mono-num text-[var(--text-primary)] mt-1">
                       ${totalPortfolioUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      <span className="text-xs font-normal text-[var(--text-muted)] ml-2">
-                        ≈ {(totalPortfolioUSDT / btcTicker.price).toFixed(4)} BTC
-                      </span>
+                      {btcPrice > 0 && (
+                        <span className="text-xs font-normal text-[var(--text-muted)] ml-2">
+                          ≈ {(totalPortfolioUSDT / btcPrice).toFixed(4)} BTC
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => navigate('/deposit')}
-                      className="px-4 py-2 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-semibold cursor-pointer"
+                      className="px-4 py-2.5 rounded-lg bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] text-xs font-bold cursor-pointer"
                     >
                       Deposit
                     </button>
                     <button
                       onClick={() => navigate('/trade/spot')}
-                      className="px-4 py-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] cursor-pointer"
+                      className="px-4 py-2.5 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-bold text-[var(--text-primary)] cursor-pointer"
                     >
-                      Trade Spot
+                      Trade Now
                     </button>
                   </div>
                 </div>
@@ -170,53 +209,61 @@ export const HomePage: React.FC = () => {
             )}
 
             {/* Quantitative Exchange Proof Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-4 border-t border-[var(--border-color)]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-[var(--border-color)]">
               <div>
                 <div className="text-xl sm:text-2xl font-bold font-mono-num text-[var(--text-primary)]">
-                  $76.4B
+                  {total24hVolume > 0 ? `$${formatCompactNumber(total24hVolume)}` : '—'}
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">24h Trading Volume</div>
+                <div className="text-xs text-[var(--text-muted)] mt-0.5">
+                  Live 24h volume across tracked pairs
+                </div>
               </div>
               <div>
                 <div className="text-xl sm:text-2xl font-bold font-mono-num text-[var(--text-primary)]">
-                  350+
+                  {tickers.length > 0 ? `${tickers.length} Active` : '—'}
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">Listed Spot & Futures Pairs</div>
+                <div className="text-xs text-[var(--text-muted)] mt-0.5">
+                  Live Spot & Futures pairs
+                </div>
               </div>
               <div>
                 <div className="text-xl sm:text-2xl font-bold font-mono-num text-[var(--text-primary)]">
-                  185M+
+                  100% 1:1
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">Registered Global Traders</div>
+                <div className="text-xs text-[var(--text-muted)] mt-0.5">
+                  Merkle-tree reserve ratio
+                </div>
               </div>
               <div>
                 <div className="text-xl sm:text-2xl font-bold font-mono-num text-[#0ECB81]">
-                  &lt; 0.10%
+                  0.10%
                 </div>
-                <div className="text-xs text-[var(--text-muted)] mt-0.5">Lowest Tier Trading Fees</div>
+                <div className="text-xs text-[var(--text-muted)] mt-0.5">
+                  Standard Spot maker/taker fee
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right 5 Columns: Live Market Widget + Announcement/Airdrop Card */}
+          {/* Right 5 Columns: Live Market Widget Card + News/Launchpool Card */}
           <div className="lg:col-span-5 space-y-4">
             {/* Live Market Card */}
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 sm:p-5">
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[var(--border-color)]">
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 sm:p-5 shadow-lg">
+              <div className="flex items-center justify-between pb-3 mb-2 border-b border-[var(--border-color)]">
                 <div className="flex items-center gap-4">
                   {(
                     [
                       { id: 'popular', label: 'Popular' },
+                      { id: 'new', label: 'New Listing' },
                       { id: 'gainers', label: 'Top Gainers' },
-                      { id: 'volume', label: '24h Volume' },
                     ] as const
                   ).map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setMarketTab(tab.id)}
-                      className={`text-xs font-semibold pb-1 transition-colors cursor-pointer ${
+                      className={`text-xs font-bold pb-2 -mb-3.5 transition-colors cursor-pointer ${
                         marketTab === tab.id
-                          ? 'text-[#F0B90B] border-b-2 border-[#F0B90B]'
+                          ? 'text-[var(--text-primary)] border-b-2 border-[#F0B90B]'
                           : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                       }`}
                     >
@@ -228,314 +275,255 @@ export const HomePage: React.FC = () => {
                   onClick={() => navigate('/markets')}
                   className="text-xs text-[var(--text-muted)] hover:text-[#F0B90B] flex items-center gap-0.5 cursor-pointer"
                 >
-                  View All 350+
+                  View All Markets
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              <div className="space-y-1">
-                {displayedTickers.map((t) => {
-                  const isUp = t.priceChangePercent >= 0;
-                  return (
-                    <div
-                      key={t.symbol}
-                      onClick={() => navigate('/trade/spot', t.symbol)}
-                      className="flex items-center justify-between py-2.5 px-2.5 rounded-lg hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+              <div className="space-y-0.5">
+                {marketLoading && displayedTickers.length === 0 ? (
+                  <div className="py-12 text-center text-xs text-[var(--text-muted)]">
+                    Loading live market feed...
+                  </div>
+                ) : marketError && displayedTickers.length === 0 ? (
+                  <div className="py-10 text-center space-y-2">
+                    <div className="text-xs font-bold text-[#F6465D]">{marketError}</div>
+                    <button
+                      onClick={refreshMarkets}
+                      className="px-3 py-1.5 rounded bg-[#F0B90B] text-[#181A20] text-xs font-bold cursor-pointer"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-color)] flex items-center justify-center text-xs font-bold text-[#F0B90B]">
-                          {t.baseAsset.slice(0, 3)}
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
-                            {t.baseAsset}
-                            <span className="text-xs font-normal text-[var(--text-muted)]">
-                              /{t.quoteAsset}
+                      Retry Connection
+                    </button>
+                  </div>
+                ) : (
+                  displayedTickers.map((t) => {
+                    const isUp = t.priceChangePercent >= 0;
+                    return (
+                      <div
+                        key={t.symbol}
+                        onClick={() => navigate('/trade/spot', t.symbol)}
+                        className="flex items-center justify-between py-2.5 px-2.5 rounded-xl hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center gap-3">
+                          <CryptoIcon symbol={t.baseAsset} size="md" />
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-sm font-bold text-[var(--text-primary)]">
+                              {t.baseAsset}
                             </span>
+                            <span className="text-xs text-[var(--text-muted)]">{t.name}</span>
                           </div>
-                          <div className="text-[11px] text-[var(--text-muted)]">{t.name}</div>
                         </div>
-                      </div>
 
-                      <div className="text-right font-mono-num">
-                        <div className="text-sm font-semibold text-[var(--text-primary)]">
+                        <div className="text-right font-mono-num text-sm font-semibold text-[var(--text-primary)]">
                           ${formatPrice(t.price)}
                         </div>
-                        <div className="text-[11px] text-[var(--text-muted)]">
-                          Vol ${formatCompactNumber(t.quoteVolume24h)}
+
+                        <div
+                          className={`font-mono-num text-xs font-semibold min-w-[68px] text-right ${
+                            isUp ? 'text-[#0ECB81]' : 'text-[#F6465D]'
+                          }`}
+                        >
+                          {isUp ? '+' : ''}
+                          {t.priceChangePercent.toFixed(2)}%
                         </div>
                       </div>
-
-                      <div
-                        className={`font-mono-num text-xs font-semibold min-w-[72px] text-right ${
-                          isUp ? 'text-[#0ECB81]' : 'text-[#F6465D]'
-                        }`}
-                      >
-                        {isUp ? '+' : ''}
-                        {t.priceChangePercent.toFixed(2)}%
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </div>
 
-            {/* Featured Launchpool / Earn Callout */}
-            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-4 flex items-center justify-between gap-4">
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-[#0ECB81]">
-                  Simple Earn · Flexible & Locked
+            {/* News & Announcements Card (Exact Binance Right-Column Bottom Box) */}
+            <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-4 sm:p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[var(--text-primary)]">News & Announcements</span>
+                <button
+                  onClick={() => navigate('/announcements')}
+                  className="text-xs text-[var(--text-muted)] hover:text-[#F0B90B] flex items-center gap-0.5 cursor-pointer"
+                >
+                  View All News
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              <div className="space-y-2 text-xs">
+                <div
+                  onClick={() => navigate('/airdrop')}
+                  className="text-[var(--text-secondary)] hover:text-[#F0B90B] truncate cursor-pointer"
+                >
+                  • Introducing Hyperion ZK (HYPR) on HODLer Airdrops! Subscribe BNB to Simple Earn
                 </div>
-                <div className="text-sm font-semibold text-[var(--text-primary)]">
-                  Earn up to 11.40% APR on USDT, SOL & BNB
+                <div
+                  onClick={() => navigate('/fees')}
+                  className="text-[var(--text-secondary)] hover:text-[#F0B90B] truncate cursor-pointer"
+                >
+                  • Notice on Zero Maker Fee Promotion for All USDC Spot & Margin Trading Pairs
                 </div>
-                <div className="text-xs text-[var(--text-muted)]">
-                  Principal-protected vaults with automatic HODLer Airdrop eligibility.
+                <div
+                  onClick={() => navigate('/trade/futures')}
+                  className="text-[var(--text-secondary)] hover:text-[#F0B90B] truncate cursor-pointer"
+                >
+                  • USDⓈ-M Futures Will Launch Perpetual Contracts for SUI & RENDER with 75x Leverage
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trade on the Go — Multi-Platform Terminal Preview Section */}
+      <section className="border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/50 py-14 px-4 lg:px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          {/* Left 7 Columns: Live Interactive Mini-Terminal Preview */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {(['Desktop', 'Mobile', 'Pro'] as const).map((plat) => (
+                  <button
+                    key={plat}
+                    onClick={() => setActivePlatform(plat)}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                      activePlatform === plat
+                        ? 'bg-[#F0B90B] text-[#181A20]'
+                        : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)]'
+                    }`}
+                  >
+                    {plat} Experience
+                  </button>
+                ))}
               </div>
               <button
-                onClick={() => navigate('/earn')}
-                className="px-3.5 py-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-semibold text-[#F0B90B] shrink-0 cursor-pointer"
+                onClick={() => navigate('/trade/spot', 'BTCUSDT')}
+                className="text-xs font-bold text-[#F0B90B] hover:underline flex items-center gap-1 cursor-pointer"
               >
-                Subscribe
+                Launch Full Spot Terminal
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Quick Action Bar: Core Exchange Gateways */}
-      <section className="border-y border-[var(--border-color)] bg-[var(--bg-secondary)]/60 py-10 px-4 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-2">
-            <div>
-              <h2 className="font-display text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
-                Complete Digital Asset Ecosystem
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
-                Direct access to every trading desk, fiat gateway, and yield instrument.
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/sitemap')}
-              className="text-xs font-semibold text-[#F0B90B] hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              View Full Platform Sitemap
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div
-              onClick={() => navigate('/trade/spot')}
-              className="p-5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B]/60 transition-colors cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <TrendingUp className="w-5 h-5 text-[#F0B90B]" />
-                  <span className="text-xs text-[var(--text-muted)] font-mono-num">350+ Pairs</span>
+            {/* Simulated Desktop/Mobile Terminal Frame */}
+            <div className="rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-color)] p-5 shadow-xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-[var(--border-color)]">
+                <div className="flex items-center gap-3">
+                  <CryptoIcon symbol="BTC" size="md" />
+                  <div>
+                    <div className="text-sm font-bold text-[var(--text-primary)]">
+                      BTC/USDT · <span className="text-[#F0B90B]">{activePlatform} Mode</span>
+                    </div>
+                    <div className="text-xs text-[var(--text-muted)] font-mono-num">
+                      24h Vol: $3.11B USDT · Matching Latency &lt; 0.8ms
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)]">Spot Trading Terminal</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
-                  Real-time candlestick charts, MA7/25/99 indicators, full depth orderbook, and Limit, Market & Stop-Limit execution.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs font-semibold text-[#F0B90B]">
-                <span>Open Spot Terminal</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            <div
-              onClick={() => navigate('/trade/futures')}
-              className="p-5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B]/60 transition-colors cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <Zap className="w-5 h-5 text-[#0ECB81]" />
-                  <span className="text-xs text-[#0ECB81] font-mono-num">Up to 125x</span>
+                <div className="text-right font-mono-num">
+                  <div className="text-lg font-bold text-[#0ECB81]">
+                    ${formatPrice(btcTicker.price)}
+                  </div>
+                  <div className="text-xs text-[#0ECB81]">
+                    +{btcTicker.priceChangePercent.toFixed(2)}%
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)]">USDⓈ-M Perpetual Futures</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
-                  Trade perpetual contracts settled in USDT/USDC with Cross or Isolated margin, live funding countdown, and TP/SL controls.
-                </p>
               </div>
-              <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs font-semibold text-[#F0B90B]">
-                <span>Trade Derivatives</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
 
-            <div
-              onClick={() => navigate('/p2p')}
-              className="p-5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B]/60 transition-colors cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <Users className="w-5 h-5 text-[#F0B90B]" />
-                  <span className="text-xs text-[#0ECB81] font-mono-num">0% Transaction Fee</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div
+                  onClick={() => navigate('/trade/spot')}
+                  className="p-3.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#F0B90B] cursor-pointer"
+                >
+                  <div className="font-bold text-[var(--text-primary)]">Spot & Margin</div>
+                  <div className="text-[var(--text-muted)] mt-1">
+                    Limit, Market, Stop-Limit & OCO orders with deep liquidity.
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)]">P2P Fiat Marketplace</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
-                  Buy and sell USDT, BTC, and ETH using local bank transfers, UPI, IMPS, SEPA, and Zelle with escrow security.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs font-semibold text-[#F0B90B]">
-                <span>Browse P2P Merchants</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            <div
-              onClick={() => navigate('/convert')}
-              className="p-5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B]/60 transition-colors cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <Repeat className="w-5 h-5 text-[#0ECB81]" />
-                  <span className="text-xs text-[var(--text-muted)] font-mono-num">Zero Slippage</span>
+                <div
+                  onClick={() => navigate('/trade/futures')}
+                  className="p-3.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#F0B90B] cursor-pointer"
+                >
+                  <div className="font-bold text-[var(--text-primary)]">USDⓈ-M Futures 125x</div>
+                  <div className="text-[var(--text-muted)] mt-1">
+                    Cross/Isolated leverage with real-time TP/SL risk controls.
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)]">Instant Convert & OTC</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
-                  Swap assets in one click with guaranteed institutional quotes, zero trading fees, and immediate Spot Wallet settlement.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs font-semibold text-[#F0B90B]">
-                <span>Convert Crypto Now</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            <div
-              onClick={() => navigate('/earn')}
-              className="p-5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B]/60 transition-colors cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <Layers className="w-5 h-5 text-[#F0B90B]" />
-                  <span className="text-xs text-[#0ECB81] font-mono-num">Up to 11.40% APR</span>
+                <div
+                  onClick={() => navigate('/p2p')}
+                  className="p-3.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#F0B90B] cursor-pointer"
+                >
+                  <div className="font-bold text-[var(--text-primary)]">P2P 0% Fee Desk</div>
+                  <div className="text-[var(--text-muted)] mt-1">
+                    Instant local fiat settlement via UPI, IMPS, SEPA & Zelle.
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)]">Simple Earn & Staking</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
-                  Put idle USDT, USDC, BTC, ETH, and SOL to work in Flexible or Locked yield vaults with daily reward distribution.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs font-semibold text-[#F0B90B]">
-                <span>Explore Yield Vaults</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </div>
-            </div>
-
-            <div
-              onClick={() => navigate('/airdrop')}
-              className="p-5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B]/60 transition-colors cursor-pointer flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <Gift className="w-5 h-5 text-[#F0B90B]" />
-                  <span className="text-xs text-[#F0B90B] font-mono-num">$11.3M Rewards</span>
-                </div>
-                <h3 className="text-base font-bold text-[var(--text-primary)]">Megadrop & HODLer Airdrops</h3>
-                <p className="text-xs text-[var(--text-muted)] mt-1.5 leading-relaxed">
-                  Participate in early token launches and automatic balance snapshot distributions with zero lockup risk.
-                </p>
-              </div>
-              <div className="mt-4 pt-3 border-t border-[var(--border-color)] flex items-center justify-between text-xs font-semibold text-[#F0B90B]">
-                <span>Check Eligibility</span>
-                <ArrowRight className="w-3.5 h-3.5" />
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Security & Proof of Reserves Section */}
-      <section className="max-w-7xl mx-auto py-14 px-4 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          <div className="lg:col-span-5 space-y-4">
-            <div className="text-xs font-semibold text-[#0ECB81]">
-              SECURITY & CUSTODY ARCHITECTURE
-            </div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-              Your Assets Are Backed 1:1 and Protected by $1.0B SAFU
+          {/* Right 5 Columns: QR Code & Multi-Device Download */}
+          <div className="lg:col-span-5 space-y-5">
+            <h2 className="font-display text-2xl sm:text-4xl font-bold text-[var(--text-primary)]">
+              Trade on the Go. Anywhere, Anytime.
             </h2>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-              AetherX Pro maintains transparent, on-chain verifiable reserves exceeding 100% across all user balances, reinforced by hardware passkeys and real-time AI risk monitoring.
+              Stay connected to global markets across iOS, Android, macOS, Windows, and Linux with synchronized watchlists and instant price alerts.
             </p>
-            <div className="pt-2 flex flex-wrap gap-3">
-              <button
-                onClick={() => navigate('/proof-of-reserves')}
-                className="px-4 py-2.5 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-semibold cursor-pointer"
-              >
-                Verify Proof of Reserves
-              </button>
-              <button
-                onClick={() => navigate('/security')}
-                className="px-4 py-2.5 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] cursor-pointer"
-              >
-                Security Center
-              </button>
-            </div>
-          </div>
 
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-2">
-              <ShieldCheck className="w-6 h-6 text-[#0ECB81]" />
-              <div className="text-sm font-bold text-[var(--text-primary)]">
-                104.8% BTC Reserve Ratio
+            <div className="p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-color)] flex items-center gap-4">
+              <div className="w-20 h-20 rounded-xl bg-white p-2 flex items-center justify-center shrink-0">
+                <QrCode className="w-16 h-16 text-[#181A20]" />
               </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Zero-knowledge Merkle tree verification lets every user independently confirm their account balance is held in full custody.
-              </p>
+              <div>
+                <div className="text-xs text-[var(--text-muted)]">Scan to Download App</div>
+                <div className="text-base font-bold text-[var(--text-primary)] mt-0.5">
+                  iOS and Android
+                </div>
+                <div className="text-xs text-[#F0B90B] mt-1">
+                  Biometric Passkey & Instant Order Execution
+                </div>
+              </div>
             </div>
-            <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-2">
-              <Lock className="w-6 h-6 text-[#F0B90B]" />
-              <div className="text-sm font-bold text-[var(--text-primary)]">
-                Hardware Passkey & Whitelisting
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Multi-factor withdrawal address whitelisting, anti-phishing verification codes, and biometric WebAuthn support.
-              </p>
-            </div>
-            <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-2">
-              <Globe className="w-6 h-6 text-[#0ECB81]" />
-              <div className="text-sm font-bold text-[var(--text-primary)]">
-                $1,000,000,000 SAFU Fund
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                10% of all trading fees are allocated to our Secure Asset Fund for Users in cold public wallets.
-              </p>
-            </div>
-            <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-2">
-              <Headphones className="w-6 h-6 text-[#F0B90B]" />
-              <div className="text-sm font-bold text-[var(--text-primary)]">
-                24/7 Dedicated Multilingual Desk
-              </div>
-              <p className="text-xs text-[var(--text-muted)] leading-relaxed">
-                Instant support resolution for deposit tags, P2P escrow disputes, and institutional API onboarding.
-              </p>
+
+            <div className="grid grid-cols-3 gap-3 text-center text-xs">
+              <button
+                onClick={() => navigate('/trade/spot')}
+                className="p-3 rounded-xl bg-[var(--bg-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] font-semibold text-[var(--text-primary)] cursor-pointer"
+              >
+                macOS
+              </button>
+              <button
+                onClick={() => navigate('/trade/spot')}
+                className="p-3 rounded-xl bg-[var(--bg-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] font-semibold text-[var(--text-primary)] cursor-pointer"
+              >
+                Windows
+              </button>
+              <button
+                onClick={() => navigate('/api-docs')}
+                className="p-3 rounded-xl bg-[var(--bg-primary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] font-semibold text-[var(--text-primary)] cursor-pointer"
+              >
+                Linux / API
+              </button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Accordion */}
-      <section className="max-w-5xl mx-auto pb-16 px-4 lg:px-8">
-        <h2 className="font-display text-2xl font-bold text-[var(--text-primary)] mb-6">
+      {/* FAQ Accordion (Exact Numbered Format) */}
+      <section className="max-w-5xl mx-auto py-14 px-4 lg:px-8">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-8 text-center">
           Frequently Asked Questions
         </h2>
-        <div className="divide-y divide-[var(--border-color)] border-y border-[var(--border-color)]">
+        <div className="space-y-2">
           {faqs.map((item, idx) => {
             const isOpen = openFaq === idx;
             return (
-              <div key={idx} className="py-4">
+              <div
+                key={idx}
+                className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)]/50 px-5 py-4"
+              >
                 <button
                   onClick={() => setOpenFaq(isOpen ? null : idx)}
-                  className="w-full flex items-center justify-between text-left gap-4 py-1 cursor-pointer"
+                  className="w-full flex items-center justify-between text-left gap-4 cursor-pointer"
                 >
-                  <span className="text-sm sm:text-base font-semibold text-[var(--text-primary)]">
-                    <span className="font-mono-num text-[var(--text-muted)] mr-3">
-                      0{idx + 1}.
+                  <span className="text-sm sm:text-base font-bold text-[var(--text-primary)] flex items-center gap-3">
+                    <span className="w-6 h-6 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-color)] font-mono-num text-xs flex items-center justify-center text-[var(--text-secondary)]">
+                      {idx + 1}
                     </span>
                     {item.q}
                   </span>
@@ -544,13 +532,39 @@ export const HomePage: React.FC = () => {
                   </span>
                 </button>
                 {isOpen && (
-                  <p className="mt-2.5 pl-8 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                  <p className="mt-3 pl-9 text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                     {item.a}
                   </p>
                 )}
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* Bottom Yellow CTA Banner ("Start earning today") */}
+      <section className="bg-[var(--bg-secondary)] border-t border-[var(--border-color)] py-14 px-4 text-center">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <h2 className="font-display text-2xl sm:text-4xl font-bold text-[var(--text-primary)]">
+            Start Earning Today
+          </h2>
+          <div className="flex items-center justify-center gap-3">
+            {!isAuthenticated ? (
+              <button
+                onClick={() => openAuthModal('register')}
+                className="px-8 py-3.5 rounded-xl bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] font-bold text-sm transition-colors cursor-pointer"
+              >
+                Sign Up Now
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/trade/spot')}
+                className="px-8 py-3.5 rounded-xl bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] font-bold text-sm transition-colors cursor-pointer"
+              >
+                Trade Now
+              </button>
+            )}
+          </div>
         </div>
       </section>
     </div>

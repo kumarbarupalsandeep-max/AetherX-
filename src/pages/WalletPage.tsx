@@ -19,12 +19,23 @@ export const WalletPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [walletTab, setWalletTab] = useState<'Overview' | 'Spot' | 'Futures' | 'Earn'>('Overview');
 
-  const btcPrice = tickers.find((t) => t.symbol === 'BTCUSDT')?.price || 89420.5;
+  const btcPrice = tickers.find((t) => t.symbol === 'BTCUSDT')?.price || 0;
   const totalUSDT = balances.reduce((acc, b) => acc + b.usdtValuation, 0);
   const totalStakedUSDT = balances.reduce((acc, b) => {
-    const p = b.asset === 'USDT' || b.asset === 'USDC' ? 1 : tickers.find((t) => t.baseAsset === b.asset)?.price || 1;
+    const p =
+      b.asset === 'USDT' || b.asset === 'USDC'
+        ? 1
+        : tickers.find((t) => t.baseAsset === b.asset)?.price || 0;
     return acc + b.staked * p;
   }, 0);
+  const totalInOrderUSDT = balances.reduce((acc, b) => {
+    const p =
+      b.asset === 'USDT' || b.asset === 'USDC'
+        ? 1
+        : tickers.find((t) => t.baseAsset === b.asset)?.price || 0;
+    return acc + b.inOrder * p;
+  }, 0);
+  const totalAvailableUSDT = Math.max(0, totalUSDT - totalStakedUSDT - totalInOrderUSDT);
 
   const filteredBalances = balances.filter((b) => {
     if (hideSmall && b.usdtValuation < 10) return false;
@@ -131,7 +142,7 @@ export const WalletPage: React.FC = () => {
                 </button>
               </div>
               <span className="text-xs text-[#0ECB81] font-mono-num font-semibold">
-                Today's PnL: +$1,842.30 (+0.85%)
+                Real-Time Database Ledger Valuation
               </span>
             </div>
 
@@ -147,7 +158,9 @@ export const WalletPage: React.FC = () => {
               <div className="text-xs font-mono-num text-[var(--text-muted)] mt-1">
                 {hideBalances
                   ? '≈ •••••••• BTC'
-                  : `≈ ${(totalUSDT / btcPrice).toFixed(6)} BTC`}
+                  : btcPrice > 0
+                  ? `≈ ${(totalUSDT / btcPrice).toFixed(6)} BTC`
+                  : 'Fetching live BTC rate...'}
               </div>
             </div>
 
@@ -155,19 +168,34 @@ export const WalletPage: React.FC = () => {
               <div>
                 <div className="text-[var(--text-muted)]">Spot Available</div>
                 <div className="font-mono-num font-bold text-[var(--text-primary)] mt-0.5">
-                  {hideBalances ? '••••••' : `$${(totalUSDT - totalStakedUSDT).toLocaleString()}`}
+                  {hideBalances
+                    ? '••••••'
+                    : `$${totalAvailableUSDT.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
                 </div>
               </div>
               <div>
                 <div className="text-[var(--text-muted)]">Simple Earn Staked</div>
                 <div className="font-mono-num font-bold text-[#0ECB81] mt-0.5">
-                  {hideBalances ? '••••••' : `$${totalStakedUSDT.toLocaleString()}`}
+                  {hideBalances
+                    ? '••••••'
+                    : `$${totalStakedUSDT.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
                 </div>
               </div>
               <div>
                 <div className="text-[var(--text-muted)]">In Open Orders</div>
                 <div className="font-mono-num font-bold text-[#F0B90B] mt-0.5">
-                  {hideBalances ? '••••••' : '$6,319.50'}
+                  {hideBalances
+                    ? '••••••'
+                    : `$${totalInOrderUSDT.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
                 </div>
               </div>
             </div>

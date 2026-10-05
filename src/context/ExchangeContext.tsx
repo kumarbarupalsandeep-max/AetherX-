@@ -9,14 +9,7 @@ import {
   UserProfile,
   AirdropCampaign,
 } from '../types/exchange';
-import {
-  INITIAL_TICKERS,
-  INITIAL_BALANCES,
-  INITIAL_ORDERS,
-  INITIAL_TRADES,
-  INITIAL_NOTIFICATIONS,
-  AIRDROP_CAMPAIGNS,
-} from '../data/exchangeData';
+import { AIRDROP_CAMPAIGNS } from '../data/exchangeData';
 
 interface ToastMessage {
   id: string;
@@ -31,23 +24,30 @@ interface ExchangeContextValue {
   theme: 'dark' | 'light';
   toggleTheme: () => void;
   tickers: TickerPair[];
+  marketLoading: boolean;
+  marketError: string | null;
+  refreshMarkets: () => Promise<void>;
   selectedPair: string;
   setSelectedPair: (symbol: string) => void;
   toggleFavoritePair: (symbol: string) => void;
   isLiveConnected: boolean;
   isAuthenticated: boolean;
-  user: UserProfile;
+  authLoading: boolean;
+  sessionToken: string | null;
+  user: UserProfile | null;
   authModalOpen: boolean;
   authModalMode: 'login' | 'register';
   openAuthModal: (mode?: 'login' | 'register') => void;
   closeAuthModal: () => void;
-  login: (email: string) => void;
-  logout: () => void;
+  loginWithCredentials: (email: string, password: string) => Promise<boolean>;
+  registerAccount: (email: string, password: string, referralCode?: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   balances: AssetBalance[];
   orders: ExchangeOrder[];
   trades: ExecutedTrade[];
   notifications: NotificationItem[];
   airdrops: AirdropCampaign[];
+  refreshUserData: () => Promise<void>;
   placeOrder: (params: {
     pair: string;
     marketType: 'Spot' | 'Futures';
@@ -57,17 +57,28 @@ interface ExchangeContextValue {
     stopPrice?: number;
     amount: number;
     leverage?: number;
-  }) => boolean;
-  cancelOrder: (orderId: string) => void;
-  cancelAllOpenOrders: () => void;
-  convertCrypto: (fromAsset: string, toAsset: string, fromAmount: number, toAmount: number) => boolean;
-  depositAsset: (asset: string, amount: number, network: string) => void;
-  withdrawAsset: (asset: string, amount: number, address: string, network: string, fee: number) => boolean;
-  subscribeEarn: (asset: string, amount: number, apr: number) => boolean;
-  claimAirdrop: (campaignId: string) => void;
-  markNotificationRead: (id: string) => void;
-  markAllNotificationsRead: () => void;
-  updateUserProfile: (patch: Partial<UserProfile>) => void;
+  }) => Promise<boolean>;
+  cancelOrder: (orderId: string) => Promise<void>;
+  cancelAllOpenOrders: () => Promise<void>;
+  convertCrypto: (
+    fromAsset: string,
+    toAsset: string,
+    fromAmount: number,
+    toAmount: number
+  ) => Promise<boolean>;
+  depositAsset: (asset: string, amount: number, network: string, txHash?: string) => Promise<boolean>;
+  withdrawAsset: (
+    asset: string,
+    amount: number,
+    address: string,
+    network: string,
+    fee: number
+  ) => Promise<boolean>;
+  subscribeEarn: (asset: string, amount: number, apr: number) => Promise<boolean>;
+  claimAirdrop: (campaignId: string) => Promise<void>;
+  markNotificationRead: (id: string) => Promise<void>;
+  markAllNotificationsRead: () => Promise<void>;
+  updateUserProfile: (patch: Partial<UserProfile>) => Promise<void>;
   toasts: ToastMessage[];
   pushToast: (toast: Omit<ToastMessage, 'id'>) => void;
   dismissToast: (id: string) => void;
@@ -120,37 +131,33 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved === 'light' ? 'light' : 'dark';
   });
 
-  const [tickers, setTickers] = useState<TickerPair[]>(INITIAL_TICKERS);
+  const [favoriteSymbols, setFavoriteSymbols] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('aetherx_favs');
+      return saved ? JSON.parse(saved) : ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
+    } catch {
+      return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
+    }
+  });
+
+  const [tickers, setTickers] = useState<TickerPair[]>([]);
+  const [marketLoading, setMarketLoading] = useState<boolean>(true);
+  const [marketError, setMarketError] = useState<string | null>(null);
   const [selectedPair, setSelectedPair] = useState<string>('BTCUSDT');
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(false);
 
-  // Start unauthenticated so user can test both 80% public browsing & gated actions seamlessly
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem('aetherx_auth') === 'true';
+  const [sessionToken, setSessionToken] = useState<string | null>(() => {
+    return localStorage.getItem('aetherx_session_token');
   });
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
 
-  const [user, setUser] = useState<UserProfile>({
-    uid: '849201749',
-    email: 'trader.pro@aetherx.io',
-    nickname: 'AlphaDesk_VIP',
-    vipLevel: 'VIP 1',
-    kycStatus: 'Verified Plus',
-    kycDailyLimitUSDT: 2000000,
-    twoFactorEnabled: true,
-    antiPhishingCode: 'AX-9920-SAFE',
-    withdrawalWhitelistEnabled: false,
-    passkeyConnected: true,
-    referralCode: 'AETHERVIP20',
-    referredFriends: 18,
-    totalCommissionUSDT: 1428.65,
-  });
-
-  const [balances, setBalances] = useState<AssetBalance[]>(INITIAL_BALANCES);
-  const [orders, setOrders] = useState<ExchangeOrder[]>(INITIAL_ORDERS);
-  const [trades, setTrades] = useState<ExecutedTrade[]>(INITIAL_TRADES);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [balances, setBalances] = useState<AssetBalance[]>([]);
+  const [orders, setOrders] = useState<ExchangeOrder[]>([]);
+  const [trades, setTrades] = useState<ExecutedTrade[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [airdrops, setAirdrops] = useState<AirdropCampaign[]>(AIRDROP_CAMPAIGNS);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -159,14 +166,13 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setToasts((prev) => [...prev, { ...toast, id }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+    }, 4500);
   }, []);
 
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // Theme synchronization with document.documentElement
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark') {
@@ -181,7 +187,6 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   }, []);
 
-  // History API routing + Popstate listener
   useEffect(() => {
     const handlePopState = () => {
       setRoute(parseCurrentPath());
@@ -201,77 +206,133 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Connect to real public Binance 24hr ticker API + WebSocket stream with automatic high-frequency fallback
-  useEffect(() => {
-    let isMounted = true;
-    const symbols = INITIAL_TICKERS.map((t) => t.symbol);
-
-    async function fetchReal24hrTickers() {
-      try {
-        const query = encodeURIComponent(JSON.stringify(symbols));
-        const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${query}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!isMounted || !Array.isArray(data)) return;
-
-        setIsLiveConnected(true);
-        setTickers((prev) =>
-          prev.map((item) => {
-            const live = data.find((d: any) => d.symbol === item.symbol);
-            if (!live) return item;
-            const lastPrice = parseFloat(live.lastPrice);
-            if (!lastPrice || isNaN(lastPrice)) return item;
-            return {
-              ...item,
-              price: lastPrice,
-              priceChange: parseFloat(live.priceChange) || item.priceChange,
-              priceChangePercent: parseFloat(live.priceChangePercent) || item.priceChangePercent,
-              high24h: parseFloat(live.highPrice) || item.high24h,
-              low24h: parseFloat(live.lowPrice) || item.low24h,
-              volume24h: parseFloat(live.volume) || item.volume24h,
-              quoteVolume24h: parseFloat(live.quoteVolume) || item.quoteVolume24h,
-            };
-          })
-        );
-      } catch {
-        // Fallback tick engine handles live updates when sandbox blocks external REST
+  // Fetch Real Upstream Market Data from Backend API (/api/market/tickers)
+  const refreshMarkets = useCallback(async () => {
+    try {
+      const res = await fetch('/api/market/tickers');
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `Market API returned HTTP ${res.status}`);
       }
-    }
+      const data = await res.json();
+      if (!Array.isArray(data.tickers) || data.tickers.length === 0) {
+        throw new Error('Live market ticker feed returned empty dataset');
+      }
 
-    fetchReal24hrTickers();
-    const restInterval = setInterval(fetchReal24hrTickers, 12000);
-
-    // High-frequency micro-tick engine so orderbooks and prices pulse smoothly every 1.6s
-    const microTickInterval = setInterval(() => {
-      if (!isMounted) return;
-      setTickers((prev) =>
-        prev.map((t) => {
-          const deltaPct = (Math.random() - 0.492) * 0.0018;
-          const nextPrice = Math.max(0.0001, Number((t.price * (1 + deltaPct)).toFixed(t.price > 100 ? 2 : 4)));
-          const nextChangePct = Number((t.priceChangePercent + deltaPct * 65).toFixed(2));
-          return {
-            ...t,
-            price: nextPrice,
-            priceChangePercent: nextChangePct,
-            high24h: Math.max(t.high24h, nextPrice),
-            low24h: Math.min(t.low24h, nextPrice),
-          };
-        })
+      setTickers(
+        data.tickers.map((t: TickerPair) => ({
+          ...t,
+          isFavorite: favoriteSymbols.includes(t.symbol),
+        }))
       );
-    }, 1600);
+      setMarketError(null);
+      setIsLiveConnected(true);
+    } catch (err: any) {
+      setIsLiveConnected(false);
+      setMarketError(err.message || 'Live market data unavailable');
+    } finally {
+      setMarketLoading(false);
+    }
+  }, [favoriteSymbols]);
 
-    return () => {
-      isMounted = false;
-      clearInterval(restInterval);
-      clearInterval(microTickInterval);
-    };
-  }, []);
+  useEffect(() => {
+    refreshMarkets();
+    const interval = setInterval(refreshMarkets, 4000);
+    return () => clearInterval(interval);
+  }, [refreshMarkets]);
 
   const toggleFavoritePair = useCallback((symbol: string) => {
+    setFavoriteSymbols((prev) => {
+      const next = prev.includes(symbol)
+        ? prev.filter((s) => s !== symbol)
+        : [...prev, symbol];
+      localStorage.setItem('aetherx_favs', JSON.stringify(next));
+      return next;
+    });
     setTickers((prev) =>
       prev.map((t) => (t.symbol === symbol ? { ...t, isFavorite: !t.isFavorite } : t))
     );
   }, []);
+
+  // Fetch Authenticated User's Real SQLite Ledger, Orders, Trades & Notifications
+  const refreshUserData = useCallback(
+    async (overrideToken?: string | null) => {
+      const activeToken = overrideToken !== undefined ? overrideToken : sessionToken;
+      if (!activeToken) {
+        setUser(null);
+        setBalances([]);
+        setOrders([]);
+        setTrades([]);
+        setNotifications([]);
+        setAuthLoading(false);
+        return;
+      }
+
+      const headers = { Authorization: `Bearer ${activeToken}` };
+      try {
+        const [meRes, walRes, ordRes, trdRes, ntfRes, airRes] = await Promise.all([
+          fetch('/api/auth/me', { headers }),
+          fetch('/api/wallet/balances', { headers }),
+          fetch('/api/orders', { headers }),
+          fetch('/api/trades', { headers }),
+          fetch('/api/notifications', { headers }),
+          fetch('/api/airdrop/claims', { headers }),
+        ]);
+
+        if (meRes.status === 401) {
+          localStorage.removeItem('aetherx_session_token');
+          setSessionToken(null);
+          setUser(null);
+          setBalances([]);
+          setOrders([]);
+          setTrades([]);
+          setNotifications([]);
+          setAuthLoading(false);
+          return;
+        }
+
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          setUser(meData.user);
+        }
+        if (walRes.ok) {
+          const walData = await walRes.json();
+          setBalances(walData.balances || []);
+        }
+        if (ordRes.ok) {
+          const ordData = await ordRes.json();
+          setOrders(ordData.orders || []);
+        }
+        if (trdRes.ok) {
+          const trdData = await trdRes.json();
+          setTrades(trdData.trades || []);
+        }
+        if (ntfRes.ok) {
+          const ntfData = await ntfRes.json();
+          setNotifications(ntfData.notifications || []);
+        }
+        if (airRes.ok) {
+          const airData = await airRes.json();
+          const claimedIds: string[] = airData.claimedCampaignIds || [];
+          setAirdrops(
+            AIRDROP_CAMPAIGNS.map((c) => ({
+              ...c,
+              userClaimed: claimedIds.includes(c.id),
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to synchronize user account state:', err);
+      } finally {
+        setAuthLoading(false);
+      }
+    },
+    [sessionToken]
+  );
+
+  useEffect(() => {
+    refreshUserData();
+  }, [refreshUserData]);
 
   const openAuthModal = useCallback((mode: 'login' | 'register' = 'login') => {
     setAuthModalMode(mode);
@@ -282,32 +343,113 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setAuthModalOpen(false);
   }, []);
 
-  const login = useCallback((email: string) => {
-    setIsAuthenticated(true);
-    localStorage.setItem('aetherx_auth', 'true');
-    if (email && email.includes('@')) {
-      setUser((prev) => ({ ...prev, email }));
-    }
-    setAuthModalOpen(false);
-    pushToast({
-      type: 'success',
-      title: 'Signed In Successfully',
-      description: `Welcome back to AetherX Pro (${email || 'VIP Account'})`,
-    });
-  }, [pushToast]);
+  const loginWithCredentials = useCallback(
+    async (email: string, password: string): Promise<boolean> => {
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Login Failed',
+            description: data.error || 'Invalid credentials.',
+          });
+          return false;
+        }
 
-  const logout = useCallback(() => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('aetherx_auth');
+        localStorage.setItem('aetherx_session_token', data.token);
+        setSessionToken(data.token);
+        setUser(data.user);
+        setAuthModalOpen(false);
+        await refreshUserData(data.token);
+
+        pushToast({
+          type: 'success',
+          title: 'Signed In Successfully',
+          description: `Authenticated as ${data.user.email} (UID: ${data.user.uid})`,
+        });
+        return true;
+      } catch (err: any) {
+        pushToast({
+          type: 'error',
+          title: 'Authentication Service Error',
+          description: err.message || 'Unable to reach backend authentication service.',
+        });
+        return false;
+      }
+    },
+    [pushToast, refreshUserData]
+  );
+
+  const registerAccount = useCallback(
+    async (email: string, password: string, referralCode?: string): Promise<boolean> => {
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, referralCode }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Registration Failed',
+            description: data.error || 'Could not register account.',
+          });
+          return false;
+        }
+
+        localStorage.setItem('aetherx_session_token', data.token);
+        setSessionToken(data.token);
+        setUser(data.user);
+        setAuthModalOpen(false);
+        await refreshUserData(data.token);
+
+        pushToast({
+          type: 'success',
+          title: 'Account Created & Wallets Provisioned',
+          description: `Welcome ${data.user.email}! Your Spot wallets are ready.`,
+        });
+        return true;
+      } catch (err: any) {
+        pushToast({
+          type: 'error',
+          title: 'Registration Service Error',
+          description: err.message || 'Unable to reach backend service.',
+        });
+        return false;
+      }
+    },
+    [pushToast, refreshUserData]
+  );
+
+  const logout = useCallback(async () => {
+    if (sessionToken) {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${sessionToken}` },
+      }).catch(() => {});
+    }
+    localStorage.removeItem('aetherx_session_token');
+    setSessionToken(null);
+    setUser(null);
+    setBalances([]);
+    setOrders([]);
+    setTrades([]);
+    setNotifications([]);
     pushToast({
       type: 'info',
       title: 'Signed Out',
-      description: 'You are now browsing in public view mode.',
+      description: 'Your session token has been revoked.',
     });
-  }, [pushToast]);
+  }, [sessionToken, pushToast]);
 
   const placeOrder = useCallback(
-    (params: {
+    async (params: {
       pair: string;
       marketType: 'Spot' | 'Futures';
       type: 'Limit' | 'Market' | 'Stop-Limit';
@@ -316,418 +458,425 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       stopPrice?: number;
       amount: number;
       leverage?: number;
-    }): boolean => {
-      if (!isAuthenticated) {
+    }): Promise<boolean> => {
+      if (!sessionToken || !user) {
         openAuthModal('login');
         return false;
       }
 
-      const ticker = tickers.find((t) => t.symbol === params.pair) || tickers[0];
-      const execPrice = params.type === 'Market' ? ticker.price : params.price;
-      const totalUSDT = Number((execPrice * params.amount).toFixed(2));
-      const baseAsset = ticker.baseAsset;
-
-      // Validate balance
-      if (params.side === 'Buy') {
-        const usdtBal = balances.find((b) => b.asset === 'USDT');
-        const requiredMargin = params.marketType === 'Futures' && params.leverage
-          ? totalUSDT / params.leverage
-          : totalUSDT;
-        if (!usdtBal || usdtBal.available < requiredMargin) {
+      try {
+        const res = await fetch('/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify({
+            ...params,
+            clientOrderId: `CLI-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
           pushToast({
             type: 'error',
-            title: 'Insufficient USDT Balance',
-            description: `Required: ${requiredMargin.toFixed(2)} USDT. Available: ${(usdtBal?.available || 0).toFixed(2)} USDT.`,
+            title: 'Order Rejected',
+            description: data.error || 'Could not place order.',
           });
           return false;
         }
-      } else {
-        if (params.marketType === 'Spot') {
-          const assetBal = balances.find((b) => b.asset === baseAsset);
-          if (!assetBal || assetBal.available < params.amount) {
-            pushToast({
-              type: 'error',
-              title: `Insufficient ${baseAsset} Balance`,
-              description: `Required: ${params.amount} ${baseAsset}. Available: ${(assetBal?.available || 0).toFixed(4)} ${baseAsset}.`,
-            });
-            return false;
-          }
-        }
-      }
 
-      const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
-      const orderId = `ORD-${Math.floor(1000000 + Math.random() * 9000000)}`;
-      const isImmediateFill = params.type === 'Market';
-
-      const newOrder: ExchangeOrder = {
-        id: orderId,
-        pair: params.pair,
-        marketType: params.marketType,
-        type: params.type,
-        side: params.side,
-        price: execPrice,
-        stopPrice: params.stopPrice,
-        amount: params.amount,
-        filled: isImmediateFill ? params.amount : 0,
-        total: totalUSDT,
-        status: isImmediateFill ? 'Filled' : 'Open',
-        createdAt: nowStr,
-        leverage: params.leverage,
-      };
-
-      setOrders((prev) => [newOrder, ...prev]);
-
-      if (isImmediateFill) {
-        const tradeEntry: ExecutedTrade = {
-          id: `TRD-${Math.floor(1000000 + Math.random() * 9000000)}`,
-          orderId,
-          pair: params.pair,
-          side: params.side,
-          price: execPrice,
-          amount: params.amount,
-          fee: Number((totalUSDT * 0.001).toFixed(4)),
-          feeAsset: 'USDT',
-          role: 'Taker',
-          total: totalUSDT,
-          timestamp: nowStr,
-        };
-        setTrades((prev) => [tradeEntry, ...prev]);
-
-        // Adjust balances
-        setBalances((prev) => {
-          const next = [...prev];
-          const usdtIdx = next.findIndex((b) => b.asset === 'USDT');
-          const baseIdx = next.findIndex((b) => b.asset === baseAsset);
-
-          if (params.side === 'Buy') {
-            if (usdtIdx > -1) {
-              next[usdtIdx] = {
-                ...next[usdtIdx],
-                available: Math.max(0, Number((next[usdtIdx].available - totalUSDT).toFixed(2))),
-              };
-            }
-            if (baseIdx > -1) {
-              next[baseIdx] = {
-                ...next[baseIdx],
-                available: Number((next[baseIdx].available + params.amount).toFixed(4)),
-              };
-            } else {
-              next.push({
-                asset: baseAsset,
-                name: ticker.name,
-                available: params.amount,
-                inOrder: 0,
-                staked: 0,
-                btcValuation: (params.amount * execPrice) / 89420,
-                usdtValuation: params.amount * execPrice,
-                networks: INITIAL_BALANCES[0].networks,
-              });
-            }
-          } else {
-            if (baseIdx > -1) {
-              next[baseIdx] = {
-                ...next[baseIdx],
-                available: Math.max(0, Number((next[baseIdx].available - params.amount).toFixed(4))),
-              };
-            }
-            if (usdtIdx > -1) {
-              next[usdtIdx] = {
-                ...next[usdtIdx],
-                available: Number((next[usdtIdx].available + totalUSDT).toFixed(2)),
-              };
-            }
-          }
-          return next;
-        });
-
+        await refreshUserData();
         pushToast({
           type: 'success',
-          title: `${params.marketType} Market ${params.side} Filled`,
-          description: `${params.amount} ${baseAsset} executed at ${execPrice.toLocaleString()} USDT`,
+          title: data.executedImmediately
+            ? `${params.marketType} ${params.side} Order Filled`
+            : `${params.type} ${params.side} Order Placed`,
+          description: `${params.amount} ${params.pair.replace('USDT', '')} @ ${Number(
+            data.executionPrice
+          ).toLocaleString()} USDT (#${data.orderId})`,
         });
-      } else {
-        // Reserve inOrder funds for Limit/Stop-Limit
-        setBalances((prev) =>
-          prev.map((b) => {
-            if (params.side === 'Buy' && b.asset === 'USDT') {
-              const lockAmt = params.marketType === 'Futures' && params.leverage ? totalUSDT / params.leverage : totalUSDT;
-              return {
-                ...b,
-                available: Math.max(0, Number((b.available - lockAmt).toFixed(2))),
-                inOrder: Number((b.inOrder + lockAmt).toFixed(2)),
-              };
-            }
-            if (params.side === 'Sell' && b.asset === baseAsset && params.marketType === 'Spot') {
-              return {
-                ...b,
-                available: Math.max(0, Number((b.available - params.amount).toFixed(4))),
-                inOrder: Number((b.inOrder + params.amount).toFixed(4)),
-              };
-            }
-            return b;
-          })
-        );
-
+        return true;
+      } catch (err: any) {
         pushToast({
-          type: 'success',
-          title: `${params.type} ${params.side} Order Placed`,
-          description: `${params.amount} ${baseAsset} @ ${execPrice.toLocaleString()} USDT (#${orderId})`,
+          type: 'error',
+          title: 'Order Execution Error',
+          description: err.message || 'Backend order engine unreachable.',
         });
+        return false;
       }
-
-      return true;
     },
-    [isAuthenticated, openAuthModal, tickers, balances, pushToast]
+    [sessionToken, user, openAuthModal, pushToast, refreshUserData]
   );
 
   const cancelOrder = useCallback(
-    (orderId: string) => {
-      const target = orders.find((o) => o.id === orderId);
-      if (!target || target.status !== 'Open') return;
-
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, status: 'Cancelled' } : o))
-      );
-
-      const baseAsset = target.pair.replace('USDT', '');
-      setBalances((prev) =>
-        prev.map((b) => {
-          if (target.side === 'Buy' && b.asset === 'USDT') {
-            return {
-              ...b,
-              available: Number((b.available + target.total).toFixed(2)),
-              inOrder: Math.max(0, Number((b.inOrder - target.total).toFixed(2))),
-            };
-          }
-          if (target.side === 'Sell' && b.asset === baseAsset) {
-            return {
-              ...b,
-              available: Number((b.available + target.amount).toFixed(4)),
-              inOrder: Math.max(0, Number((b.inOrder - target.amount).toFixed(4))),
-            };
-          }
-          return b;
-        })
-      );
-
-      pushToast({
-        type: 'info',
-        title: 'Order Cancelled',
-        description: `Order #${orderId} (${target.pair}) has been cancelled and funds unlocked.`,
-      });
+    async (orderId: string) => {
+      if (!sessionToken) return;
+      try {
+        const res = await fetch(`/api/orders/${orderId}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Cancel Failed',
+            description: data.error || 'Could not cancel order.',
+          });
+          return;
+        }
+        await refreshUserData();
+        pushToast({
+          type: 'info',
+          title: 'Order Cancelled',
+          description: `Order #${orderId} cancelled and reserved funds unlocked in database.`,
+        });
+      } catch (err: any) {
+        pushToast({
+          type: 'error',
+          title: 'Network Error',
+          description: err.message,
+        });
+      }
     },
-    [orders, pushToast]
+    [sessionToken, pushToast, refreshUserData]
   );
 
-  const cancelAllOpenOrders = useCallback(() => {
-    const openCount = orders.filter((o) => o.status === 'Open').length;
-    if (openCount === 0) return;
-    setOrders((prev) =>
-      prev.map((o) => (o.status === 'Open' ? { ...o, status: 'Cancelled' } : o))
-    );
-    pushToast({
-      type: 'info',
-      title: 'All Open Orders Cancelled',
-      description: `${openCount} active order(s) cancelled.`,
-    });
-  }, [orders, pushToast]);
+  const cancelAllOpenOrders = useCallback(async () => {
+    if (!sessionToken) return;
+    try {
+      const res = await fetch('/api/orders/cancel-all', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${sessionToken}` },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        pushToast({
+          type: 'error',
+          title: 'Cancel All Failed',
+          description: data.error,
+        });
+        return;
+      }
+      await refreshUserData();
+      pushToast({
+        type: 'info',
+        title: 'All Open Orders Cancelled',
+        description: `${data.cancelledCount} active order(s) cancelled and funds unlocked.`,
+      });
+    } catch (err: any) {
+      pushToast({ type: 'error', title: 'Error', description: err.message });
+    }
+  }, [sessionToken, pushToast, refreshUserData]);
 
   const convertCrypto = useCallback(
-    (fromAsset: string, toAsset: string, fromAmount: number, toAmount: number): boolean => {
-      if (!isAuthenticated) {
+    async (
+      fromAsset: string,
+      toAsset: string,
+      fromAmount: number,
+      _toAmount: number
+    ): Promise<boolean> => {
+      if (!sessionToken || !user) {
         openAuthModal('login');
         return false;
       }
-      const sourceBal = balances.find((b) => b.asset === fromAsset);
-      if (!sourceBal || sourceBal.available < fromAmount) {
+      try {
+        const res = await fetch('/api/convert', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify({ fromAsset, toAsset, fromAmount }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Conversion Rejected',
+            description: data.error || 'Conversion failed.',
+          });
+          return false;
+        }
+        await refreshUserData();
+        pushToast({
+          type: 'success',
+          title: 'Zero-Fee Conversion Settled',
+          description: `Converted ${data.fromAmount} ${fromAsset} to ${Number(
+            data.toAmount
+          ).toFixed(6)} ${toAsset} in your Spot Wallet.`,
+        });
+        return true;
+      } catch (err: any) {
         pushToast({
           type: 'error',
-          title: `Insufficient ${fromAsset} Balance`,
-          description: `You need ${fromAmount} ${fromAsset} to complete this instant conversion.`,
+          title: 'Conversion Error',
+          description: err.message,
         });
         return false;
       }
-
-      setBalances((prev) => {
-        const next = prev.map((b) => {
-          if (b.asset === fromAsset) {
-            return { ...b, available: Math.max(0, Number((b.available - fromAmount).toFixed(4))) };
-          }
-          if (b.asset === toAsset) {
-            return { ...b, available: Number((b.available + toAmount).toFixed(4)) };
-          }
-          return b;
-        });
-        return next;
-      });
-
-      const nowStr = new Date().toISOString().replace('T', ' ').slice(0, 19);
-      setTrades((prev) => [
-        {
-          id: `CNV-${Math.floor(100000 + Math.random() * 900000)}`,
-          orderId: 'INSTANT-CONVERT',
-          pair: `${toAsset}/${fromAsset}`,
-          side: 'Buy',
-          price: Number((fromAmount / Math.max(0.00001, toAmount)).toFixed(4)),
-          amount: toAmount,
-          fee: 0,
-          feeAsset: toAsset,
-          role: 'Maker',
-          total: fromAmount,
-          timestamp: nowStr,
-        },
-        ...prev,
-      ]);
-
-      pushToast({
-        type: 'success',
-        title: 'Zero-Fee Conversion Completed',
-        description: `Converted ${fromAmount} ${fromAsset} to ${toAmount.toFixed(4)} ${toAsset} instantly.`,
-      });
-      return true;
     },
-    [isAuthenticated, openAuthModal, balances, pushToast]
+    [sessionToken, user, openAuthModal, pushToast, refreshUserData]
   );
 
   const depositAsset = useCallback(
-    (asset: string, amount: number, network: string) => {
-      setBalances((prev) =>
-        prev.map((b) =>
-          b.asset === asset
-            ? {
-                ...b,
-                available: Number((b.available + amount).toFixed(4)),
-                usdtValuation: Number((b.usdtValuation + amount).toFixed(2)),
-              }
-            : b
-        )
-      );
-      pushToast({
-        type: 'success',
-        title: 'Deposit Confirmed on Blockchain',
-        description: `+${amount} ${asset} credited via ${network} to your Spot Wallet.`,
-      });
+    async (
+      asset: string,
+      amount: number,
+      network: string,
+      txHash?: string
+    ): Promise<boolean> => {
+      if (!sessionToken || !user) {
+        openAuthModal('login');
+        return false;
+      }
+      try {
+        const res = await fetch('/api/wallet/deposit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify({ asset, amount, network, txHash }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Deposit Failed',
+            description: data.error,
+          });
+          return false;
+        }
+        await refreshUserData();
+        pushToast({
+          type: 'success',
+          title: 'Deposit Credited to Ledger',
+          description: `+${amount} ${asset} confirmed on ${network} (TX: ${data.txHash.slice(
+            0,
+            12
+          )}...).`,
+        });
+        return true;
+      } catch (err: any) {
+        pushToast({
+          type: 'error',
+          title: 'Deposit Error',
+          description: err.message,
+        });
+        return false;
+      }
     },
-    [pushToast]
+    [sessionToken, user, openAuthModal, pushToast, refreshUserData]
   );
 
   const withdrawAsset = useCallback(
-    (asset: string, amount: number, address: string, network: string, fee: number): boolean => {
-      if (!isAuthenticated) {
+    async (
+      asset: string,
+      amount: number,
+      address: string,
+      network: string,
+      fee: number
+    ): Promise<boolean> => {
+      if (!sessionToken || !user) {
         openAuthModal('login');
         return false;
       }
-      const bal = balances.find((b) => b.asset === asset);
-      if (!bal || bal.available < amount) {
+      try {
+        const res = await fetch('/api/wallet/withdraw', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify({ asset, amount, address, network, fee }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Withdrawal Rejected',
+            description: data.error,
+          });
+          return false;
+        }
+        await refreshUserData();
+        pushToast({
+          type: 'success',
+          title: 'Withdrawal Broadcasted',
+          description: `${(amount - fee).toFixed(4)} ${asset} sent to ${address.slice(
+            0,
+            8
+          )}... (TX: ${data.txHash.slice(0, 10)}...)`,
+        });
+        return true;
+      } catch (err: any) {
         pushToast({
           type: 'error',
-          title: 'Insufficient Available Balance',
-          description: `Cannot withdraw ${amount} ${asset}. Available: ${bal?.available || 0} ${asset}`,
+          title: 'Withdrawal Error',
+          description: err.message,
         });
         return false;
       }
-
-      setBalances((prev) =>
-        prev.map((b) =>
-          b.asset === asset
-            ? {
-                ...b,
-                available: Math.max(0, Number((b.available - amount).toFixed(4))),
-              }
-            : b
-        )
-      );
-
-      pushToast({
-        type: 'success',
-        title: 'Withdrawal Broadcasted',
-        description: `${(amount - fee).toFixed(4)} ${asset} sent to ${address.slice(0, 8)}...${address.slice(-6)} (${network}).`,
-      });
-      return true;
     },
-    [isAuthenticated, openAuthModal, balances, pushToast]
+    [sessionToken, user, openAuthModal, pushToast, refreshUserData]
   );
 
   const subscribeEarn = useCallback(
-    (asset: string, amount: number, apr: number): boolean => {
-      if (!isAuthenticated) {
+    async (asset: string, amount: number, apr: number): Promise<boolean> => {
+      if (!sessionToken || !user) {
         openAuthModal('login');
         return false;
       }
-      const bal = balances.find((b) => b.asset === asset);
-      if (!bal || bal.available < amount) {
+      try {
+        const res = await fetch('/api/earn/subscribe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify({ asset, amount, apr }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Subscription Rejected',
+            description: data.error,
+          });
+          return false;
+        }
+        await refreshUserData();
+        pushToast({
+          type: 'success',
+          title: 'Simple Earn Subscription Active',
+          description: `Staked ${amount} ${asset} at ${apr}% APR in database ledger.`,
+        });
+        return true;
+      } catch (err: any) {
         pushToast({
           type: 'error',
-          title: `Insufficient ${asset} Balance`,
-          description: `Please deposit or convert ${asset} before subscribing to Simple Earn.`,
+          title: 'Earn Error',
+          description: err.message,
         });
         return false;
       }
-
-      setBalances((prev) =>
-        prev.map((b) =>
-          b.asset === asset
-            ? {
-                ...b,
-                available: Number((b.available - amount).toFixed(4)),
-                staked: Number((b.staked + amount).toFixed(4)),
-              }
-            : b
-        )
-      );
-
-      pushToast({
-        type: 'success',
-        title: 'Simple Earn Subscription Active',
-        description: `Staked ${amount} ${asset} at ${apr}% Est. APR. Daily rewards start accruing tomorrow.`,
-      });
-      return true;
     },
-    [isAuthenticated, openAuthModal, balances, pushToast]
+    [sessionToken, user, openAuthModal, pushToast, refreshUserData]
   );
 
   const claimAirdrop = useCallback(
-    (campaignId: string) => {
-      if (!isAuthenticated) {
+    async (campaignId: string) => {
+      if (!sessionToken || !user) {
         openAuthModal('login');
         return;
       }
-      setAirdrops((prev) =>
-        prev.map((a) => (a.id === campaignId ? { ...a, userClaimed: true } : a))
-      );
       const target = airdrops.find((a) => a.id === campaignId);
-      pushToast({
-        type: 'success',
-        title: 'Airdrop Allocation Claimed',
-        description: `${target?.estimatedAllocation || 'Reward'} credited to your Spot Wallet.`,
-      });
+      if (!target) return;
+
+      try {
+        const res = await fetch('/api/airdrop/claim', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify({
+            campaignId,
+            snapshotAsset: target.snapshotAsset,
+            minHoldingRequired: target.minHoldingRequired,
+            rewardAmount: parseFloat(target.estimatedAllocation) || 50,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Airdrop Claim Rejected',
+            description: data.error,
+          });
+          return;
+        }
+        await refreshUserData();
+        pushToast({
+          type: 'success',
+          title: 'Airdrop Allocation Claimed',
+          description: `${target.estimatedAllocation} credited to your Spot USDT Wallet.`,
+        });
+      } catch (err: any) {
+        pushToast({
+          type: 'error',
+          title: 'Claim Error',
+          description: err.message,
+        });
+      }
     },
-    [isAuthenticated, openAuthModal, airdrops, pushToast]
+    [sessionToken, user, openAuthModal, airdrops, pushToast, refreshUserData]
   );
 
-  const markNotificationRead = useCallback((id: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
-  }, []);
+  const markNotificationRead = useCallback(
+    async (id: string) => {
+      if (!sessionToken) return;
+      await fetch(`/api/notifications/${id}/read`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${sessionToken}` },
+      }).catch(() => {});
+      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    },
+    [sessionToken]
+  );
 
-  const markAllNotificationsRead = useCallback(() => {
+  const markAllNotificationsRead = useCallback(async () => {
+    if (!sessionToken) return;
+    await fetch('/api/notifications/read-all', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${sessionToken}` },
+    }).catch(() => {});
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     pushToast({
       type: 'info',
-      title: 'Notifications Cleared',
+      title: 'Notifications Updated',
       description: 'All notifications marked as read.',
     });
-  }, [pushToast]);
+  }, [sessionToken, pushToast]);
 
   const updateUserProfile = useCallback(
-    (patch: Partial<UserProfile>) => {
-      setUser((prev) => ({ ...prev, ...patch }));
-      pushToast({
-        type: 'success',
-        title: 'Account Settings Updated',
-        description: 'Your security and profile preferences have been saved.',
-      });
+    async (patch: Partial<UserProfile>) => {
+      if (!sessionToken) return;
+      try {
+        const res = await fetch('/api/account/profile', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${sessionToken}`,
+          },
+          body: JSON.stringify(patch),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          pushToast({
+            type: 'error',
+            title: 'Update Failed',
+            description: data.error,
+          });
+          return;
+        }
+        setUser(data.user);
+        pushToast({
+          type: 'success',
+          title: 'Account & Security Updated',
+          description: 'Your preferences have been persisted to the database.',
+        });
+      } catch (err: any) {
+        pushToast({
+          type: 'error',
+          title: 'Update Error',
+          description: err.message,
+        });
+      }
     },
-    [pushToast]
+    [sessionToken, pushToast]
   );
 
   return (
@@ -738,23 +887,30 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         theme,
         toggleTheme,
         tickers,
+        marketLoading,
+        marketError,
+        refreshMarkets,
         selectedPair,
         setSelectedPair,
         toggleFavoritePair,
         isLiveConnected,
-        isAuthenticated,
+        isAuthenticated: Boolean(user && sessionToken),
+        authLoading,
+        sessionToken,
         user,
         authModalOpen,
         authModalMode,
         openAuthModal,
         closeAuthModal,
-        login,
+        loginWithCredentials,
+        registerAccount,
         logout,
         balances,
         orders,
         trades,
         notifications,
         airdrops,
+        refreshUserData,
         placeOrder,
         cancelOrder,
         cancelAllOpenOrders,

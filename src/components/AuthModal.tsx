@@ -3,11 +3,19 @@ import { X, ShieldCheck, Lock, Mail, KeyRound, CheckCircle2 } from 'lucide-react
 import { useExchange } from '../context/ExchangeContext';
 
 export const AuthModal: React.FC = () => {
-  const { authModalOpen, authModalMode, closeAuthModal, login } = useExchange();
+  const {
+    authModalOpen,
+    authModalMode,
+    closeAuthModal,
+    loginWithCredentials,
+    registerAccount,
+  } = useExchange();
+
   const [mode, setMode] = useState<'login' | 'register'>(authModalMode);
-  const [email, setEmail] = useState('trader.pro@aetherx.io');
-  const [password, setPassword] = useState('••••••••••••');
-  const [referralCode, setReferralCode] = useState('AETHERVIP20');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   React.useEffect(() => {
     setMode(authModalMode);
@@ -15,9 +23,19 @@ export const AuthModal: React.FC = () => {
 
   if (!authModalOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email.trim() || 'trader.pro@aetherx.io');
+    if (!email.trim() || !password) return;
+    setSubmitting(true);
+    try {
+      if (mode === 'login') {
+        await loginWithCredentials(email.trim(), password);
+      } else {
+        await registerAccount(email.trim(), password, referralCode.trim());
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -53,7 +71,7 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={() => setMode('login')}
-              className={`py-2 text-xs font-semibold rounded-md transition-colors ${
+              className={`py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
                 mode === 'login'
                   ? 'bg-[var(--bg-elevated)] text-[#F0B90B]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
@@ -64,19 +82,19 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={() => setMode('register')}
-              className={`py-2 text-xs font-semibold rounded-md transition-colors ${
+              className={`py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
                 mode === 'register'
                   ? 'bg-[var(--bg-elevated)] text-[#F0B90B]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
-              Register (Up to $100 Bonus)
+              Register New Account
             </button>
           </div>
 
           <div>
             <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-              Email / Sub-Account
+              Email Address
             </label>
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B]">
               <Mail className="w-4 h-4 text-[var(--text-muted)]" />
@@ -85,7 +103,7 @@ export const AuthModal: React.FC = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder="you@example.com"
                 className="w-full bg-transparent text-sm text-[var(--text-primary)] focus:outline-none"
               />
             </div>
@@ -93,13 +111,14 @@ export const AuthModal: React.FC = () => {
 
           <div>
             <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-              Password
+              Password (minimum 6 characters)
             </label>
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B]">
               <KeyRound className="w-4 h-4 text-[var(--text-muted)]" />
               <input
                 type="password"
                 required
+                minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -111,12 +130,13 @@ export const AuthModal: React.FC = () => {
           {mode === 'register' && (
             <div>
               <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
-                Referral ID (Optional — 20% Fee Discount Applied)
+                Referral ID (Optional)
               </label>
               <input
                 type="text"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value)}
+                placeholder="e.g. AX94F210"
                 className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] font-mono-num focus:outline-none focus:border-[#F0B90B]"
               />
             </div>
@@ -124,20 +144,28 @@ export const AuthModal: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-semibold text-sm transition-colors cursor-pointer"
+            disabled={submitting}
+            className="w-full py-3 rounded-lg bg-[#FCD535] hover:bg-[#F0B90B] disabled:opacity-50 text-[#181A20] font-bold text-sm transition-colors cursor-pointer"
           >
-            {mode === 'login' ? 'Log In & Unlock Trading' : 'Create Verified Account'}
+            {submitting
+              ? 'Verifying Credentials...'
+              : mode === 'login'
+              ? 'Log In'
+              : 'Create Account & Initialize Wallets'}
           </button>
 
           <div className="pt-2 border-t border-[var(--border-color)] flex items-center justify-between text-xs text-[var(--text-muted)]">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-[#0ECB81]" />
-              Passkey & Authenticator Protected
+              Scrypt Hashed & Session Protected
             </span>
-            <span className="flex items-center gap-1 text-[#0ECB81]">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              Instant Demo Access
-            </span>
+            <button
+              type="button"
+              onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+              className="text-[#F0B90B] font-semibold hover:underline cursor-pointer"
+            >
+              {mode === 'login' ? 'Need an account? Register' : 'Already registered? Log In'}
+            </button>
           </div>
         </form>
       </div>

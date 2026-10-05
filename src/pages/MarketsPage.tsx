@@ -4,44 +4,44 @@ import {
   Star,
   ArrowUpDown,
   TrendingUp,
-  TrendingDown,
   Flame,
-  BarChart3,
+  Sparkles,
+  BarChart2,
 } from 'lucide-react';
 import { useExchange } from '../context/ExchangeContext';
 import { formatPrice, formatCompactNumber } from '../data/exchangeData';
+import { CryptoIcon } from '../components/CryptoIcon';
 
 export const MarketsPage: React.FC = () => {
-  const { tickers, navigate, toggleFavoritePair } = useExchange();
+  const { tickers, marketLoading, marketError, refreshMarkets, navigate, toggleFavoritePair } =
+    useExchange();
+  const [marketSubTab, setMarketSubTab] = useState<'All' | 'Favorites' | 'Spot' | 'Futures' | 'Zones'>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [search, setSearch] = useState('');
   const [sortField, setSortField] = useState<'symbol' | 'price' | 'change' | 'volume' | 'marketCap'>('volume');
   const [sortAsc, setSortAsc] = useState(false);
 
-  const topGainer = useMemo(
-    () => [...tickers].sort((a, b) => b.priceChangePercent - a.priceChangePercent)[0],
+  const hotCoins = useMemo(() => tickers.slice(0, 3), [tickers]);
+  const newListings = useMemo(
+    () => tickers.filter((t) => ['SUI', 'RENDER', 'NEAR'].includes(t.baseAsset)),
+    [tickers]
+  );
+  const topGainers = useMemo(
+    () => [...tickers].sort((a, b) => b.priceChangePercent - a.priceChangePercent).slice(0, 3),
     [tickers]
   );
   const topVolume = useMemo(
-    () => [...tickers].sort((a, b) => b.quoteVolume24h - a.quoteVolume24h)[0],
-    [tickers]
-  );
-  const topDip = useMemo(
-    () => [...tickers].sort((a, b) => a.priceChangePercent - b.priceChangePercent)[0],
+    () => [...tickers].sort((a, b) => b.quoteVolume24h - a.quoteVolume24h).slice(0, 3),
     [tickers]
   );
 
-  const categories = ['All', 'Favorites', 'Layer 1', 'Solana', 'AI', 'DeFi', 'Infra', 'Payments'];
+  const categories = ['All', 'Layer 1', 'Solana', 'AI', 'DeFi', 'Infra', 'Payments'];
 
   const filteredTickers = useMemo(() => {
     return tickers
       .filter((t) => {
-        if (selectedCategory === 'Favorites' && !t.isFavorite) return false;
-        if (
-          selectedCategory !== 'All' &&
-          selectedCategory !== 'Favorites' &&
-          t.category !== selectedCategory
-        ) {
+        if (marketSubTab === 'Favorites' && !t.isFavorite) return false;
+        if (selectedCategory !== 'All' && t.category !== selectedCategory) {
           return false;
         }
         if (
@@ -62,7 +62,7 @@ export const MarketsPage: React.FC = () => {
         if (sortField === 'marketCap') cmp = a.marketCap - b.marketCap;
         return sortAsc ? cmp : -cmp;
       });
-  }, [tickers, selectedCategory, search, sortField, sortAsc]);
+  }, [tickers, marketSubTab, selectedCategory, search, sortField, sortAsc]);
 
   const handleSort = (field: typeof sortField) => {
     if (sortField === field) {
@@ -73,155 +73,113 @@ export const MarketsPage: React.FC = () => {
     }
   };
 
+  const renderCardList = (title: string, items: typeof tickers) => (
+    <div className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-3">
+      <div className="flex items-center justify-between text-xs font-bold text-[var(--text-muted)]">
+        <span>{title}</span>
+        <span>24h Change</span>
+      </div>
+      <div className="space-y-2">
+        {items.map((item) => {
+          const isUp = item.priceChangePercent >= 0;
+          return (
+            <div
+              key={item.symbol}
+              onClick={() => navigate('/trade/spot', item.symbol)}
+              className="flex items-center justify-between py-1 px-1.5 rounded-lg hover:bg-[var(--bg-hover)] cursor-pointer transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <CryptoIcon symbol={item.baseAsset} size="sm" />
+                <span className="text-xs font-bold text-[var(--text-primary)]">
+                  {item.baseAsset}
+                </span>
+              </div>
+              <span className="text-xs font-mono-num text-[var(--text-primary)]">
+                ${formatPrice(item.price)}
+              </span>
+              <span
+                className={`text-xs font-mono-num font-semibold ${
+                  isUp ? 'text-[#0ECB81]' : 'text-[#F6465D]'
+                }`}
+              >
+                {isUp ? '+' : ''}
+                {item.priceChangePercent.toFixed(2)}%
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] py-8 px-4 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <h1 className="font-display text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
-              Markets Overview
-            </h1>
-            <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
-              Real-time prices, 24h volume, and market capitalization across Spot and Perpetual markets.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => navigate('/trade/spot')}
-              className="px-3.5 py-2 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-semibold cursor-pointer"
-            >
-              Spot Terminal
-            </button>
-            <button
-              onClick={() => navigate('/trade/futures')}
-              className="px-3.5 py-2 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] cursor-pointer"
-            >
-              USDⓈ-M Futures
-            </button>
-          </div>
-        </div>
-
-        {/* Highlight Cards (Hot / Top Gainer / Volume Leader / Dip Watch) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div
-            onClick={() => navigate('/trade/spot', topGainer.symbol)}
-            className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#0ECB81]/50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-2">
-              <span className="flex items-center gap-1.5 font-medium text-[#0ECB81]">
-                <TrendingUp className="w-3.5 h-3.5" />
-                24h Top Gainer
-              </span>
-              <span>Spot / Futures</span>
-            </div>
-            <div className="flex items-baseline justify-between">
-              <div>
-                <div className="text-base font-bold text-[var(--text-primary)]">
-                  {topGainer.baseAsset}/USDT
-                </div>
-                <div className="text-xs text-[var(--text-muted)]">{topGainer.name}</div>
-              </div>
-              <div className="text-right font-mono-num">
-                <div className="text-base font-bold text-[var(--text-primary)]">
-                  ${formatPrice(topGainer.price)}
-                </div>
-                <div className="text-xs font-semibold text-[#0ECB81]">
-                  +{topGainer.priceChangePercent.toFixed(2)}%
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            onClick={() => navigate('/trade/spot', topVolume.symbol)}
-            className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#F0B90B]/50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-2">
-              <span className="flex items-center gap-1.5 font-medium text-[#F0B90B]">
-                <Flame className="w-3.5 h-3.5" />
-                24h Volume Leader
-              </span>
-              <span>Deep Liquidity</span>
-            </div>
-            <div className="flex items-baseline justify-between">
-              <div>
-                <div className="text-base font-bold text-[var(--text-primary)]">
-                  {topVolume.baseAsset}/USDT
-                </div>
-                <div className="text-xs text-[var(--text-muted)]">
-                  Vol ${formatCompactNumber(topVolume.quoteVolume24h)}
-                </div>
-              </div>
-              <div className="text-right font-mono-num">
-                <div className="text-base font-bold text-[var(--text-primary)]">
-                  ${formatPrice(topVolume.price)}
-                </div>
-                <div className="text-xs font-semibold text-[#0ECB81]">
-                  +{topVolume.priceChangePercent.toFixed(2)}%
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            onClick={() => navigate('/trade/spot', topDip.symbol)}
-            className="p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#F6465D]/50 transition-colors cursor-pointer"
-          >
-            <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-2">
-              <span className="flex items-center gap-1.5 font-medium text-[#F6465D]">
-                <TrendingDown className="w-3.5 h-3.5" />
-                Pullback Watch
-              </span>
-              <span>Volatility Alert</span>
-            </div>
-            <div className="flex items-baseline justify-between">
-              <div>
-                <div className="text-base font-bold text-[var(--text-primary)]">
-                  {topDip.baseAsset}/USDT
-                </div>
-                <div className="text-xs text-[var(--text-muted)]">{topDip.name}</div>
-              </div>
-              <div className="text-right font-mono-num">
-                <div className="text-base font-bold text-[var(--text-primary)]">
-                  ${formatPrice(topDip.price)}
-                </div>
-                <div className="text-xs font-semibold text-[#F6465D]">
-                  {topDip.priceChangePercent.toFixed(2)}%
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Category Filter Tabs & Search Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-[var(--border-color)]">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
-                  selectedCategory === cat
-                    ? 'bg-[#F0B90B] text-[#181A20]'
-                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] focus-within:border-[#F0B90B] rounded-lg px-3 py-1.5 w-full md:w-72">
+        {/* Top Heading */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
+            Markets Overview
+          </h1>
+          <div className="flex items-center gap-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] focus-within:border-[#F0B90B] rounded-xl px-3.5 py-2 w-full sm:w-80">
             <Search className="w-4 h-4 text-[var(--text-muted)]" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search coin name or symbol..."
+              placeholder="Search coin name or symbol"
               className="w-full bg-transparent text-xs text-[var(--text-primary)] focus:outline-none"
             />
           </div>
+        </div>
+
+        {/* 4-Card Top Market Summary Row (Exact Binance Reference Layout) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {renderCardList('Hot Coins', hotCoins)}
+          {renderCardList('New Listings', newListings)}
+          {renderCardList('Top Gainer Coin', topGainers)}
+          {renderCardList('Top Volume Coin', topVolume)}
+        </div>
+
+        {/* Primary Market Sub-Tabs */}
+        <div className="flex items-center gap-6 border-b border-[var(--border-color)] text-sm font-bold overflow-x-auto">
+          {(
+            [
+              { id: 'Favorites', label: 'Favorites' },
+              { id: 'All', label: 'All Cryptos' },
+              { id: 'Spot', label: 'Spot Markets' },
+              { id: 'Futures', label: 'Futures Markets' },
+              { id: 'Zones', label: 'Trading Zones' },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setMarketSubTab(t.id)}
+              className={`pb-3 transition-colors whitespace-nowrap cursor-pointer ${
+                marketSubTab === t.id
+                  ? 'text-[var(--text-primary)] border-b-2 border-[#F0B90B]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Category Filter Buttons */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
+                selectedCategory === cat
+                  ? 'bg-[var(--bg-hover)] text-[#F0B90B]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
         {/* High-Density Market Data Grid */}
@@ -235,7 +193,7 @@ export const MarketsPage: React.FC = () => {
                       onClick={() => handleSort('symbol')}
                       className="flex items-center gap-1 hover:text-[var(--text-primary)] cursor-pointer"
                     >
-                      Name / Pair <ArrowUpDown className="w-3 h-3" />
+                      Name <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
                   <th className="py-3 px-4 text-right">
@@ -243,7 +201,7 @@ export const MarketsPage: React.FC = () => {
                       onClick={() => handleSort('price')}
                       className="inline-flex items-center gap-1 hover:text-[var(--text-primary)] cursor-pointer"
                     >
-                      Last Price <ArrowUpDown className="w-3 h-3" />
+                      Price <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
                   <th className="py-3 px-4 text-right">
@@ -254,13 +212,12 @@ export const MarketsPage: React.FC = () => {
                       24h Change <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-right hidden md:table-cell">24h High / Low</th>
                   <th className="py-3 px-4 text-right hidden sm:table-cell">
                     <button
                       onClick={() => handleSort('volume')}
                       className="inline-flex items-center gap-1 hover:text-[var(--text-primary)] cursor-pointer"
                     >
-                      24h Volume (USDT) <ArrowUpDown className="w-3 h-3" />
+                      24h Volume <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
                   <th className="py-3 px-4 text-right hidden lg:table-cell">
@@ -271,14 +228,32 @@ export const MarketsPage: React.FC = () => {
                       Market Cap <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
-                  <th className="py-3 px-4 text-right">Action</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-color)]/60 text-xs">
-                {filteredTickers.length === 0 ? (
+                {marketLoading && tickers.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-[var(--text-muted)]">
-                      No trading pairs match "{search}" in {selectedCategory}.
+                    <td colSpan={6} className="py-12 text-center text-[var(--text-muted)]">
+                      Loading live market tickers from upstream provider...
+                    </td>
+                  </tr>
+                ) : marketError && tickers.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center space-y-3">
+                      <div className="text-[#F6465D] font-bold">{marketError}</div>
+                      <button
+                        onClick={refreshMarkets}
+                        className="px-4 py-2 rounded-lg bg-[#F0B90B] text-[#181A20] text-xs font-bold cursor-pointer"
+                      >
+                        Retry Live Connection
+                      </button>
+                    </td>
+                  </tr>
+                ) : filteredTickers.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-[var(--text-muted)]">
+                      No trading pairs match "{search}".
                     </td>
                   </tr>
                 ) : (
@@ -287,7 +262,12 @@ export const MarketsPage: React.FC = () => {
                     return (
                       <tr
                         key={t.symbol}
-                        onClick={() => navigate('/trade/spot', t.symbol)}
+                        onClick={() =>
+                          navigate(
+                            marketSubTab === 'Futures' ? '/trade/futures' : '/trade/spot',
+                            t.symbol
+                          )
+                        }
                         className="hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
                       >
                         <td className="py-3.5 px-4">
@@ -307,26 +287,16 @@ export const MarketsPage: React.FC = () => {
                                 }`}
                               />
                             </button>
-                            <div className="w-7 h-7 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-color)] flex items-center justify-center font-bold text-[#F0B90B]">
-                              {t.baseAsset.slice(0, 3)}
-                            </div>
-                            <div>
-                              <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                            <CryptoIcon symbol={t.baseAsset} size="md" />
+                            <div className="flex items-baseline gap-2">
+                              <span className="font-bold text-sm text-[var(--text-primary)]">
                                 {t.baseAsset}
-                                <span className="font-normal text-[var(--text-muted)]">
-                                  /{t.quoteAsset}
-                                </span>
-                                <span className="text-[10px] font-mono-num text-[var(--text-muted)]">
-                                  · {t.maxLeverage}x
-                                </span>
-                              </div>
-                              <div className="text-[11px] text-[var(--text-muted)]">
-                                {t.name} · {t.category}
-                              </div>
+                              </span>
+                              <span className="text-xs text-[var(--text-muted)]">{t.name}</span>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3.5 px-4 text-right font-mono-num font-semibold text-[var(--text-primary)]">
+                        <td className="py-3.5 px-4 text-right font-mono-num font-semibold text-sm text-[var(--text-primary)]">
                           ${formatPrice(t.price)}
                         </td>
                         <td
@@ -337,9 +307,6 @@ export const MarketsPage: React.FC = () => {
                           {isUp ? '+' : ''}
                           {t.priceChangePercent.toFixed(2)}%
                         </td>
-                        <td className="py-3.5 px-4 text-right font-mono-num text-[var(--text-secondary)] hidden md:table-cell">
-                          ${formatPrice(t.high24h)} / ${formatPrice(t.low24h)}
-                        </td>
                         <td className="py-3.5 px-4 text-right font-mono-num text-[var(--text-secondary)] hidden sm:table-cell">
                           ${formatCompactNumber(t.quoteVolume24h)}
                         </td>
@@ -347,14 +314,14 @@ export const MarketsPage: React.FC = () => {
                           ${formatCompactNumber(t.marketCap)}
                         </td>
                         <td className="py-3.5 px-4 text-right">
-                          <div className="inline-flex items-center gap-2">
+                          <div className="inline-flex items-center gap-3">
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigate('/convert');
                               }}
-                              className="text-xs text-[var(--text-secondary)] hover:text-[#F0B90B] font-medium"
+                              className="text-xs text-[#F0B90B] hover:underline font-semibold"
                             >
                               Convert
                             </button>
@@ -364,7 +331,7 @@ export const MarketsPage: React.FC = () => {
                                 e.stopPropagation();
                                 navigate('/trade/spot', t.symbol);
                               }}
-                              className="px-2.5 py-1 rounded bg-[#F0B90B]/15 text-[#F0B90B] hover:bg-[#F0B90B] hover:text-[#181A20] font-semibold transition-colors"
+                              className="text-xs text-[#F0B90B] hover:underline font-semibold"
                             >
                               Trade
                             </button>
