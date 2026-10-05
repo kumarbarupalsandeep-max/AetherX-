@@ -1,0 +1,6 @@
+{
+  "name": "AetherX Pro Exchange",
+  "description": "Institutional-grade digital asset exchange platform featuring live market data, spot & futures trading, P2P marketplace, instant conversion, Staking & Earn products, and comprehensive asset management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
