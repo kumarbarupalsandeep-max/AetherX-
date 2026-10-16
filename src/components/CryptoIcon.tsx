@@ -6,13 +6,13 @@ const COIN_META: Record<
 > = {
   BTC: { bg: '#F7931A', fg: '#FFFFFF', label: '₿' },
   ETH: { bg: '#627EEA', fg: '#FFFFFF', label: 'Ξ' },
-  BNB: { bg: '#F0B90B', fg: '#181A20', label: 'B' },
+  BNB: { bg: '#2E68FF', fg: '#FFFFFF', label: 'B' },
   SOL: { bg: '#14F195', fg: '#0B0E11', label: 'S' },
   USDT: { bg: '#26A17B', fg: '#FFFFFF', label: '₮' },
   USDC: { bg: '#2775CA', fg: '#FFFFFF', label: '$' },
   XRP: { bg: '#23292F', fg: '#FFFFFF', label: '✕' },
   ADA: { bg: '#0033AD', fg: '#FFFFFF', label: '₳' },
-  DOGE: { bg: '#C2A633', fg: '#FFFFFF', label: 'Ð' },
+  DOGE: { bg: '#3B82F6', fg: '#FFFFFF', label: 'Ð' },
   AVAX: { bg: '#E84142', fg: '#FFFFFF', label: 'A' },
   LINK: { bg: '#2A5ADA', fg: '#FFFFFF', label: '⬡' },
   SUI: { bg: '#4DA2FF', fg: '#FFFFFF', label: 'S' },
@@ -30,8 +30,8 @@ export const CryptoIcon: React.FC<{
 }> = ({ symbol, size = 'md' }) => {
   const clean = symbol.replace('USDT', '').replace('USDC', '') || symbol;
   const meta = COIN_META[clean] || {
-    bg: '#F0B90B',
-    fg: '#181A20',
+    bg: '#2E68FF',
+    fg: '#FFFFFF',
     label: clean.slice(0, 1),
   };
 

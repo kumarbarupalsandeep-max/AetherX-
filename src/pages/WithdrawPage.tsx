@@ -16,10 +16,10 @@ export const WithdrawPage: React.FC = () => {
   const parsedAmount = parseFloat(amount) || 0;
   const receiveAmount = Math.max(0, parsedAmount - networkObj.fee);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!address.trim() || parsedAmount <= networkObj.fee) return;
-    const ok = withdrawAsset(
+    const ok = await withdrawAsset(
       selectedAsset,
       parsedAmount,
       address.trim(),
@@ -36,7 +36,7 @@ export const WithdrawPage: React.FC = () => {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-primary)] text-[var(--text-primary)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#F0B90B]/15 text-[#F0B90B] flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-[#2E68FF]/15 text-[#2E68FF] flex items-center justify-center mx-auto">
             <Lock className="w-6 h-6" />
           </div>
           <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
@@ -47,7 +47,7 @@ export const WithdrawPage: React.FC = () => {
           </p>
           <button
             onClick={() => openAuthModal('login')}
-            className="w-full py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+            className="w-full py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
           >
             Log In
           </button>
@@ -70,7 +70,7 @@ export const WithdrawPage: React.FC = () => {
           </div>
           <button
             onClick={() => navigate('/wallet')}
-            className="text-xs font-semibold text-[#F0B90B] hover:underline cursor-pointer"
+            className="text-xs font-semibold text-[#2E68FF] hover:underline cursor-pointer"
           >
             Back to Wallet Overview
           </button>
@@ -96,7 +96,7 @@ export const WithdrawPage: React.FC = () => {
                   }}
                   className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
                     selectedAsset === b.asset
-                      ? 'border-[#F0B90B] bg-[#F0B90B]/15 text-[#F0B90B]'
+                      ? 'border-[#2E68FF] bg-[#2E68FF]/15 text-[#2E68FF]'
                       : 'border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)]'
                   }`}
                 >
@@ -117,7 +117,7 @@ export const WithdrawPage: React.FC = () => {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder={`Enter ${selectedAsset} recipient address (e.g. ${networkObj.depositAddress.slice(0, 14)}...)`}
-              className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+              className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#2E68FF]"
             />
           </div>
 
@@ -134,7 +134,7 @@ export const WithdrawPage: React.FC = () => {
                   onClick={() => setSelectedNetworkIdx(idx)}
                   className={`p-3 rounded-lg border text-left transition-colors cursor-pointer ${
                     selectedNetworkIdx === idx
-                      ? 'border-[#F0B90B] bg-[#F0B90B]/10'
+                      ? 'border-[#2E68FF] bg-[#2E68FF]/10'
                       : 'border-[var(--border-color)] bg-[var(--bg-primary)]'
                   }`}
                 >
@@ -163,7 +163,7 @@ export const WithdrawPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setAmount(assetObj.available.toString())}
-                  className="text-[#F0B90B] font-bold ml-1 hover:underline cursor-pointer"
+                  className="text-[#2E68FF] font-bold ml-1 hover:underline cursor-pointer"
                 >
                   MAX
                 </button>
@@ -177,7 +177,7 @@ export const WithdrawPage: React.FC = () => {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder={`Minimum ${networkObj.minWithdraw} ${selectedAsset}`}
-              className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+              className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#2E68FF]"
             />
           </div>
 
@@ -194,7 +194,7 @@ export const WithdrawPage: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="px-6 py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+              className="px-6 py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
             >
               Withdraw {selectedAsset}
             </button>

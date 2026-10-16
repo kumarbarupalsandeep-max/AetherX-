@@ -222,7 +222,7 @@ export function ensureUserWallets(userId: string) {
 export function getDeterministicDepositAddress(userId: string, asset: string, networkCode: string): string {
   const digest = crypto
     .createHash('sha256')
-    .update(`${userId}:${asset}:${networkCode}:aetherx_custody`)
+    .update(`${userId}:${asset}:${networkCode}:xah_custody`)
     .digest('hex');
 
   if (networkCode === 'TRX') {

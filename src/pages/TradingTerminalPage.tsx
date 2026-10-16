@@ -274,7 +274,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-primary)] text-[var(--text-primary)] flex items-center justify-center p-6">
         <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
-          <RefreshCw className="w-4 h-4 animate-spin text-[#F0B90B]" />
+          <RefreshCw className="w-4 h-4 animate-spin text-[#2E68FF]" />
           <span>Connecting to live exchange market stream...</span>
         </div>
       </div>
@@ -292,7 +292,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
           <p className="text-xs text-[var(--text-muted)]">{marketError}</p>
           <button
             onClick={refreshMarkets}
-            className="px-5 py-2.5 rounded-lg bg-[#FCD535] text-[#181A20] text-xs font-bold cursor-pointer"
+            className="px-5 py-2.5 rounded-lg bg-[#2E68FF] text-white text-xs font-bold cursor-pointer"
           >
             Retry Connection
           </button>
@@ -320,11 +320,11 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   e.stopPropagation();
                   if (currentTicker) toggleFavoritePair(currentTicker.symbol);
                 }}
-                className="text-[var(--text-muted)] hover:text-[#F0B90B]"
+                className="text-[var(--text-muted)] hover:text-[#2E68FF]"
               >
                 <Star
                   className={`w-4 h-4 ${
-                    currentTicker?.isFavorite ? 'fill-[#F0B90B] text-[#F0B90B]' : ''
+                    currentTicker?.isFavorite ? 'fill-[#2E68FF] text-[#2E68FF]' : ''
                   }`}
                 />
               </button>
@@ -334,7 +334,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   <span className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
                     {baseAsset}/USDT
                   </span>
-                  <span className="text-[11px] font-mono-num text-[#F0B90B]">
+                  <span className="text-[11px] font-mono-num text-[#2E68FF]">
                     {marketMode === 'Futures'
                       ? `Perp · ${currentTicker?.maxLeverage || 75}x`
                       : '10x'}
@@ -462,7 +462,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                 {marketMode === 'Futures' && (
                   <div>
                     <div className="text-[11px] text-[var(--text-muted)]">Funding / Countdown</div>
-                    <div className="font-mono-num text-[#F0B90B]">
+                    <div className="font-mono-num text-[#2E68FF]">
                       +{currentTicker.fundingRate.toFixed(4)}%
                     </div>
                   </div>
@@ -485,7 +485,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
               <select
                 value={leverage}
                 onChange={(e) => setLeverage(Number(e.target.value))}
-                className="px-2 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-color)] text-xs font-mono-num font-bold text-[#F0B90B]"
+                className="px-2 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-color)] text-xs font-mono-num font-bold text-[#2E68FF]"
               >
                 {[5, 10, 20, 50, 75, 100, 125].map((lv) => (
                   <option key={lv} value={lv} className="bg-[#181A20] text-white">
@@ -497,7 +497,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
           )}
           <button
             onClick={() => navigate(marketMode === 'Spot' ? '/trade/futures' : '/trade/spot')}
-            className="px-3 py-1.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-semibold text-[#F0B90B] cursor-pointer"
+            className="px-3 py-1.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-semibold text-[#2E68FF] cursor-pointer"
           >
             {marketMode === 'Spot' ? 'Futures 125x' : 'Spot Terminal'}
           </button>
@@ -518,7 +518,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
             onClick={() => setMobileTab(tab.id)}
             className={`py-2.5 px-3 text-xs font-semibold border-b-2 ${
               mobileTab === tab.id
-                ? 'border-[#F0B90B] text-[#F0B90B]'
+                ? 'border-[#2E68FF] text-[#2E68FF]'
                 : 'border-transparent text-[var(--text-muted)]'
             }`}
           >
@@ -544,7 +544,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   onClick={() => setObFilter(mode)}
                   className={`px-1.5 py-0.5 rounded text-[10px] font-semibold capitalize cursor-pointer ${
                     obFilter === mode
-                      ? 'bg-[var(--bg-hover)] text-[#F0B90B]'
+                      ? 'bg-[var(--bg-hover)] text-[#2E68FF]'
                       : 'text-[var(--text-muted)]'
                   }`}
                 >
@@ -566,7 +566,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
               <span>{terminalError}</span>
               <button
                 onClick={fetchPairFeeds}
-                className="text-[#F0B90B] hover:underline font-semibold cursor-pointer"
+                className="text-[#2E68FF] hover:underline font-semibold cursor-pointer"
               >
                 Retry Stream
               </button>
@@ -675,7 +675,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   onClick={() => setTimeframe(tf)}
                   className={`px-2 py-0.5 rounded text-xs font-mono-num font-semibold cursor-pointer ${
                     timeframe === tf
-                      ? 'bg-[var(--bg-hover)] text-[#F0B90B]'
+                      ? 'bg-[var(--bg-hover)] text-[#2E68FF]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -686,7 +686,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
               <button
                 onClick={() => setShowMA((p) => !p)}
                 className={`px-1.5 py-0.5 rounded text-[11px] font-semibold cursor-pointer ${
-                  showMA ? 'text-[#F0B90B] bg-[#F0B90B]/10' : 'text-[var(--text-muted)]'
+                  showMA ? 'text-[#2E68FF] bg-[#2E68FF]/10' : 'text-[var(--text-muted)]'
                 }`}
               >
                 MA
@@ -716,7 +716,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   onClick={() => setChartView(v)}
                   className={`px-2 py-0.5 rounded text-[11px] font-semibold cursor-pointer ${
                     chartView === v
-                      ? 'bg-[var(--bg-hover)] text-[#F0B90B]'
+                      ? 'bg-[var(--bg-hover)] text-[#2E68FF]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -766,7 +766,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   </span>
                   {showMA && activeCandle.ma7 && (
                     <>
-                      <span className="text-[#F0B90B]">MA(7): {formatPrice(activeCandle.ma7)}</span>
+                      <span className="text-[#2E68FF]">MA(7): {formatPrice(activeCandle.ma7)}</span>
                       <span className="text-purple-400">MA(25): {formatPrice(activeCandle.ma25!)}</span>
                       <span className="text-sky-400">MA(99): {formatPrice(activeCandle.ma99!)}</span>
                     </>
@@ -842,7 +842,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                                 y1={0}
                                 x2={xCenter}
                                 y2={292}
-                                stroke="#F0B90B"
+                                stroke="#2E68FF"
                                 strokeWidth="0.8"
                                 strokeDasharray="2 2"
                               />
@@ -879,7 +879,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                         <>
                           <polyline
                             fill="none"
-                            stroke="#F0B90B"
+                            stroke="#2E68FF"
                             strokeWidth="1.4"
                             points={candles
                               .map((c, idx) => {
@@ -961,7 +961,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                     onClick={() => setOrderType(tp)}
                     className={`font-bold pb-2 -mb-2.5 transition-colors cursor-pointer ${
                       orderType === tp
-                        ? 'text-[#F0B90B] border-b-2 border-[#F0B90B]'
+                        ? 'text-[#2E68FF] border-b-2 border-[#2E68FF]'
                         : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -972,7 +972,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
               <div className="flex items-center gap-3 text-[11px]">
                 <button
                   onClick={() => navigate('/deposit')}
-                  className="text-[#F0B90B] hover:underline font-semibold cursor-pointer"
+                  className="text-[#2E68FF] hover:underline font-semibold cursor-pointer"
                 >
                   + Deposit
                 </button>
@@ -1009,7 +1009,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   </div>
                 )}
 
-                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B] text-xs">
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF] text-xs">
                   <span className="text-[var(--text-muted)]">Price</span>
                   {orderType === 'Market' ? (
                     <span className="font-mono-num text-[var(--text-muted)]">Market Price</span>
@@ -1025,7 +1025,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   <span className="text-[var(--text-muted)]">USDT</span>
                 </div>
 
-                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B] text-xs">
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF] text-xs">
                   <span className="text-[var(--text-muted)]">Amount</span>
                   <input
                     type="number"
@@ -1075,7 +1075,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   <button
                     type="button"
                     onClick={() => openAuthModal('login')}
-                    className="w-full py-2.5 rounded-lg bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] font-bold text-xs transition-colors cursor-pointer"
+                    className="w-full py-2.5 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs transition-colors cursor-pointer"
                   >
                     Log In or Register Now
                   </button>
@@ -1105,7 +1105,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   </div>
                 )}
 
-                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B] text-xs">
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF] text-xs">
                   <span className="text-[var(--text-muted)]">Price</span>
                   {orderType === 'Market' ? (
                     <span className="font-mono-num text-[var(--text-muted)]">Market Price</span>
@@ -1121,7 +1121,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   <span className="text-[var(--text-muted)]">USDT</span>
                 </div>
 
-                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B] text-xs">
+                <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF] text-xs">
                   <span className="text-[var(--text-muted)]">Amount</span>
                   <input
                     type="number"
@@ -1207,7 +1207,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                   onClick={() => setWatchlistQuoteTab(tab)}
                   className={`cursor-pointer ${
                     watchlistQuoteTab === tab
-                      ? 'text-[#F0B90B]'
+                      ? 'text-[#2E68FF]'
                       : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -1237,7 +1237,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                       <Star
                         className={`w-3 h-3 ${
                           item.isFavorite
-                            ? 'fill-[#F0B90B] text-[#F0B90B]'
+                            ? 'fill-[#2E68FF] text-[#2E68FF]'
                             : 'text-[var(--text-muted)]'
                         }`}
                       />
@@ -1263,7 +1263,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
           {/* Bottom Half: Live Market Trades */}
           <div className="p-2.5 flex-1 flex flex-col min-h-[260px]">
             <div className="flex items-center gap-4 text-xs font-bold border-b border-[var(--border-color)] pb-1.5 mb-1.5">
-              <span className="text-[#F0B90B] border-b-2 border-[#F0B90B] pb-1.5 -mb-1.5">
+              <span className="text-[#2E68FF] border-b-2 border-[#2E68FF] pb-1.5 -mb-1.5">
                 Market Trades
               </span>
             </div>
@@ -1312,7 +1312,7 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
                 onClick={() => setBottomTab(t.id)}
                 className={`py-2.5 text-xs font-bold border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
                   bottomTab === t.id
-                    ? 'border-[#F0B90B] text-[#F0B90B]'
+                    ? 'border-[#2E68FF] text-[#2E68FF]'
                     : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -1335,14 +1335,14 @@ export const TradingTerminalPage: React.FC<TradingTerminalPageProps> = ({ market
             <div className="h-36 flex items-center justify-center text-xs text-[var(--text-muted)]">
               <button
                 onClick={() => openAuthModal('login')}
-                className="text-[#F0B90B] font-bold hover:underline mr-1 cursor-pointer"
+                className="text-[#2E68FF] font-bold hover:underline mr-1 cursor-pointer"
               >
                 Log In
               </button>{' '}
               or{' '}
               <button
                 onClick={() => openAuthModal('register')}
-                className="text-[#F0B90B] font-bold hover:underline mx-1 cursor-pointer"
+                className="text-[#2E68FF] font-bold hover:underline mx-1 cursor-pointer"
               >
                 Register Now
               </button>{' '}

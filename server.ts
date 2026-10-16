@@ -175,6 +175,10 @@ function formatUserProfile(userId: string) {
 // 1. PUBLIC LIVE MARKET DATA ENDPOINTS (REAL UPSTREAM BINANCE REST PROXY)
 // ============================================================================
 
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', name: 'XAH Exchange', timestamp: new Date().toISOString() });
+});
+
 app.get('/api/market/tickers', async (_req, res) => {
   try {
     const tickers = await getLiveTickers();
@@ -285,7 +289,7 @@ app.post('/api/auth/register', (req, res) => {
       ).run(
         `NTF-${crypto.randomUUID()}`,
         userId,
-        `Welcome to AetherX Pro (${email}). Your multi-chain Spot wallets have been initialized with 0.00 balance. Deposit or Buy Crypto to start trading.`,
+        `Welcome to XAH Exchange (${email}). Your multi-chain Spot wallets have been initialized with 0.00 balance. Deposit or Buy Crypto to start trading.`,
         now
       );
     });
@@ -1253,7 +1257,7 @@ app.post('/api/notifications/:id/read', requireAuth, (req: AuthenticatedRequest,
 
 app.post('/api/support/tickets', (req, res) => {
   try {
-    const email = String(req.body.email || 'guest@aetherx.io').trim();
+    const email = String(req.body.email || 'guest@xah.exchange').trim();
     const topic = String(req.body.topic || 'General Inquiry').trim();
     const message = String(req.body.message || '').trim();
     if (!message) {
@@ -1295,7 +1299,7 @@ async function startServer() {
 
   const PORT = Number(process.env.PORT) || 3000;
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`AetherX Pro Full-Stack Exchange Server running on http://0.0.0.0:${PORT}`);
+    console.log(`XAH Exchange Full-Stack Server running on http://0.0.0.0:${PORT}`);
   });
 }
 

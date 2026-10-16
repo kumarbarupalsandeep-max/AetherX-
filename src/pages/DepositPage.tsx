@@ -29,7 +29,7 @@ export const DepositPage: React.FC = () => {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-primary)] text-[var(--text-primary)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#F0B90B]/15 text-[#F0B90B] flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-[#2E68FF]/15 text-[#2E68FF] flex items-center justify-center mx-auto">
             <Lock className="w-6 h-6" />
           </div>
           <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
@@ -40,7 +40,7 @@ export const DepositPage: React.FC = () => {
           </p>
           <button
             onClick={() => openAuthModal('login')}
-            className="w-full py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+            className="w-full py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
           >
             Log In / Register
           </button>
@@ -63,7 +63,7 @@ export const DepositPage: React.FC = () => {
           </div>
           <button
             onClick={() => navigate('/wallet')}
-            className="text-xs font-semibold text-[#F0B90B] hover:underline cursor-pointer"
+            className="text-xs font-semibold text-[#2E68FF] hover:underline cursor-pointer"
           >
             Back to Wallet Overview
           </button>
@@ -88,7 +88,7 @@ export const DepositPage: React.FC = () => {
                     }}
                     className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
                       selectedAsset === b.asset
-                        ? 'border-[#F0B90B] bg-[#F0B90B]/15 text-[#F0B90B]'
+                        ? 'border-[#2E68FF] bg-[#2E68FF]/15 text-[#2E68FF]'
                         : 'border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                     }`}
                   >
@@ -111,7 +111,7 @@ export const DepositPage: React.FC = () => {
                     onClick={() => setSelectedNetworkIdx(idx)}
                     className={`p-3 rounded-lg border text-left transition-colors cursor-pointer ${
                       selectedNetworkIdx === idx
-                        ? 'border-[#F0B90B] bg-[#F0B90B]/10'
+                        ? 'border-[#2E68FF] bg-[#2E68FF]/10'
                         : 'border-[var(--border-color)] bg-[var(--bg-primary)] hover:bg-[var(--bg-hover)]'
                     }`}
                   >
@@ -139,7 +139,7 @@ export const DepositPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleCopyAddress}
-                  className="px-3 py-2 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
+                  className="px-3 py-2 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold flex items-center gap-1.5 shrink-0 cursor-pointer"
                 >
                   {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {copied ? 'Copied' : 'Copy'}
@@ -181,7 +181,7 @@ export const DepositPage: React.FC = () => {
                   step="any"
                   value={simAmount}
                   onChange={(e) => setSimAmount(e.target.value)}
-                  className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+                  className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#2E68FF]"
                 />
                 <button
                   onClick={() =>
@@ -200,7 +200,7 @@ export const DepositPage: React.FC = () => {
 
             <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl p-5 space-y-2 text-xs text-[var(--text-muted)]">
               <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-[#F0B90B]" />
+                <ShieldCheck className="w-4 h-4 text-[#2E68FF]" />
                 Network Verification Notice
               </div>
               <p className="leading-relaxed">

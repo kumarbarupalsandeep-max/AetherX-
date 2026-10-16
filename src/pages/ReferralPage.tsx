@@ -6,8 +6,8 @@ export const ReferralPage: React.FC = () => {
   const { user, isAuthenticated, openAuthModal, pushToast } = useExchange();
   const [copiedType, setCopiedType] = useState<'code' | 'link' | null>(null);
 
-  const referralCode = user?.referralCode || 'AX-PRO2026';
-  const referralLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://aetherx.io'}/?ref=${referralCode}`;
+  const referralCode = user?.referralCode || 'XAH-PRO2026';
+  const referralLink = `${typeof window !== 'undefined' ? window.location.origin : 'https://xah.exchange'}/?ref=${referralCode}`;
 
   const handleCopy = (type: 'code' | 'link', text: string) => {
     navigator.clipboard?.writeText(text);
@@ -26,7 +26,7 @@ export const ReferralPage: React.FC = () => {
         {/* Top Split Card */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-6 sm:p-8">
           <div className="lg:col-span-7 space-y-4">
-            <div className="text-xs font-semibold text-[#F0B90B]">
+            <div className="text-xs font-semibold text-[#2E68FF]">
               AFFILIATE & REFERRAL COMMISSION PROGRAM
             </div>
             <h1 className="font-display text-2xl sm:text-4xl font-bold text-[var(--text-primary)]">
@@ -39,7 +39,7 @@ export const ReferralPage: React.FC = () => {
             <div className="grid grid-cols-3 gap-4 pt-3">
               <div className="p-3.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
                 <div className="text-[11px] text-[var(--text-muted)]">Your Rebate Rate</div>
-                <div className="text-xl font-bold font-mono-num text-[#F0B90B] mt-0.5">40%</div>
+                <div className="text-xl font-bold font-mono-num text-[#2E68FF] mt-0.5">40%</div>
               </div>
               <div className="p-3.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)]">
                 <div className="text-[11px] text-[var(--text-muted)]">Referred Traders</div>
@@ -73,7 +73,7 @@ export const ReferralPage: React.FC = () => {
                     </span>
                     <button
                       onClick={() => handleCopy('code', user.referralCode)}
-                      className="text-xs font-semibold text-[#F0B90B] flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-semibold text-[#2E68FF] flex items-center gap-1 cursor-pointer"
                     >
                       {copiedType === 'code' ? (
                         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -93,7 +93,7 @@ export const ReferralPage: React.FC = () => {
                     </span>
                     <button
                       onClick={() => handleCopy('link', referralLink)}
-                      className="text-xs font-semibold text-[#F0B90B] flex items-center gap-1 shrink-0 cursor-pointer"
+                      className="text-xs font-semibold text-[#2E68FF] flex items-center gap-1 shrink-0 cursor-pointer"
                     >
                       {copiedType === 'link' ? (
                         <CheckCircle2 className="w-3.5 h-3.5" />
@@ -107,13 +107,13 @@ export const ReferralPage: React.FC = () => {
               </>
             ) : (
               <div className="py-4 text-center space-y-3">
-                <Lock className="w-6 h-6 text-[#F0B90B] mx-auto" />
+                <Lock className="w-6 h-6 text-[#2E68FF] mx-auto" />
                 <p className="text-xs text-[var(--text-muted)]">
                   Log in or register to generate your personal referral code and track real-time commission rebates in your Spot Wallet.
                 </p>
                 <button
                   onClick={() => openAuthModal('login')}
-                  className="w-full py-2.5 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold cursor-pointer"
+                  className="w-full py-2.5 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold cursor-pointer"
                 >
                   Log In / Register
                 </button>

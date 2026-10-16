@@ -53,7 +53,7 @@ export const WalletPage: React.FC = () => {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-primary)] text-[var(--text-primary)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#F0B90B]/15 text-[#F0B90B] flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-[#2E68FF]/15 text-[#2E68FF] flex items-center justify-center mx-auto">
             <Lock className="w-6 h-6" />
           </div>
           <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
@@ -65,7 +65,7 @@ export const WalletPage: React.FC = () => {
           <div className="flex gap-3 pt-2">
             <button
               onClick={() => openAuthModal('login')}
-              className="flex-1 py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+              className="flex-1 py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
             >
               Log In
             </button>
@@ -93,7 +93,7 @@ export const WalletPage: React.FC = () => {
                 onClick={() => setWalletTab(tab)}
                 className={`pb-3 -mb-3.5 transition-colors cursor-pointer whitespace-nowrap ${
                   walletTab === tab
-                    ? 'text-[#F0B90B] border-b-2 border-[#F0B90B]'
+                    ? 'text-[#2E68FF] border-b-2 border-[#2E68FF]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -105,7 +105,7 @@ export const WalletPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/deposit')}
-              className="px-4 py-2 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer"
             >
               <ArrowDownLeft className="w-3.5 h-3.5" />
               Deposit
@@ -189,7 +189,7 @@ export const WalletPage: React.FC = () => {
               </div>
               <div>
                 <div className="text-[var(--text-muted)]">In Open Orders</div>
-                <div className="font-mono-num font-bold text-[#F0B90B] mt-0.5">
+                <div className="font-mono-num font-bold text-[#2E68FF] mt-0.5">
                   {hideBalances
                     ? '••••••'
                     : `$${totalInOrderUSDT.toLocaleString('en-US', {
@@ -203,7 +203,7 @@ export const WalletPage: React.FC = () => {
 
           <div className="lg:col-span-4 p-6 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex flex-col justify-between space-y-4">
             <div>
-              <div className="text-xs font-semibold text-[#F0B90B]">YIELD OPTIMIZATION</div>
+              <div className="text-xs font-semibold text-[#2E68FF]">YIELD OPTIMIZATION</div>
               <h3 className="text-base font-bold text-[var(--text-primary)] mt-1">
                 Auto-Subscribe Idle USDT & SOL
               </h3>
@@ -213,7 +213,7 @@ export const WalletPage: React.FC = () => {
             </div>
             <button
               onClick={() => navigate('/earn')}
-              className="w-full py-2.5 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-bold text-[#F0B90B] cursor-pointer"
+              className="w-full py-2.5 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-bold text-[#2E68FF] cursor-pointer"
             >
               Manage Simple Earn Vaults
             </button>
@@ -230,7 +230,7 @@ export const WalletPage: React.FC = () => {
                   type="checkbox"
                   checked={hideSmall}
                   onChange={(e) => setHideSmall(e.target.checked)}
-                  className="rounded border-[var(--border-color)] accent-[#F0B90B]"
+                  className="rounded border-[var(--border-color)] accent-[#2E68FF]"
                 />
                 Hide assets &lt; $10
               </label>
@@ -282,7 +282,7 @@ export const WalletPage: React.FC = () => {
                       <div className="inline-flex items-center gap-3 text-xs font-semibold">
                         <button
                           onClick={() => navigate('/deposit')}
-                          className="text-[#F0B90B] hover:underline cursor-pointer"
+                          className="text-[#2E68FF] hover:underline cursor-pointer"
                         >
                           Deposit
                         </button>

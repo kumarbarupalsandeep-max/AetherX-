@@ -75,7 +75,7 @@ export const P2PPage: React.FC = () => {
               24/7 Escrow Protection
             </span>
             <span className="flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-[#F0B90B]" />
+              <Clock className="w-4 h-4 text-[#2E68FF]" />
               Avg Release &lt; 2 Mins
             </span>
           </div>
@@ -116,7 +116,7 @@ export const P2PPage: React.FC = () => {
                   onClick={() => setSelectedAsset(asset)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                     selectedAsset === asset
-                      ? 'bg-[#F0B90B]/15 text-[#F0B90B] border border-[#F0B90B]'
+                      ? 'bg-[#2E68FF]/15 text-[#2E68FF] border border-[#2E68FF]'
                       : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'
                   }`}
                 >
@@ -172,14 +172,16 @@ export const P2PPage: React.FC = () => {
                   <tr key={ad.id} className="hover:bg-[var(--bg-hover)] transition-colors">
                     <td className="py-4 px-4">
                       <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#F0B90B]/20 text-[#F0B90B] font-bold flex items-center justify-center shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-[#2E68FF]/20 text-[#2E68FF] font-bold flex items-center justify-center shrink-0">
                           {ad.merchantName.slice(0, 1)}
                         </div>
                         <div>
                           <div className="font-bold text-sm text-[var(--text-primary)] flex items-center gap-1.5">
                             {ad.merchantName}
                             {ad.verified && (
-                              <CheckCircle2 className="w-4 h-4 text-[#F0B90B]" title="Verified Merchant" />
+                              <span title="Verified Merchant">
+                                <CheckCircle2 className="w-4 h-4 text-[#2E68FF]" />
+                              </span>
                             )}
                           </div>
                           <div className="text-[11px] text-[var(--text-muted)] font-mono-num mt-0.5">
@@ -218,7 +220,7 @@ export const P2PPage: React.FC = () => {
                         {ad.paymentMethods.map((pm) => (
                           <span
                             key={pm}
-                            className="text-[11px] font-medium text-[var(--text-secondary)] border-l-2 border-[#F0B90B] pl-2"
+                            className="text-[11px] font-medium text-[var(--text-secondary)] border-l-2 border-[#2E68FF] pl-2"
                           >
                             {pm}
                           </span>
@@ -279,7 +281,7 @@ export const P2PPage: React.FC = () => {
                   max={activeOrderModal.maxLimit}
                   value={fiatInputAmount}
                   onChange={(e) => setFiatInputAmount(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#2E68FF]"
                 />
               </div>
 

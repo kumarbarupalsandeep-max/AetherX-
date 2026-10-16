@@ -64,7 +64,7 @@ export const BuyCryptoPage: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         {/* Sub-navigation bar for Fiat & P2P Gateways */}
         <div className="flex items-center gap-6 border-b border-[var(--border-color)] pb-4 mb-8 text-sm font-semibold overflow-x-auto">
-          <button className="text-[#F0B90B] border-b-2 border-[#F0B90B] pb-4 -mb-4 whitespace-nowrap">
+          <button className="text-[#2E68FF] border-b-2 border-[#2E68FF] pb-4 -mb-4 whitespace-nowrap">
             Buy & Sell (Card / Bank)
           </button>
           <button
@@ -91,7 +91,7 @@ export const BuyCryptoPage: React.FC = () => {
           {/* Left 7 Columns: Value Proposition + Hot Market Rates */}
           <div className="lg:col-span-7 space-y-8">
             <div className="space-y-3">
-              <div className="text-xs font-semibold text-[#F0B90B]">
+              <div className="text-xs font-semibold text-[#2E68FF]">
                 INSTANT FIAT-TO-CRYPTO GATEWAY
               </div>
               <h1 className="font-display text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">
@@ -142,7 +142,7 @@ export const BuyCryptoPage: React.FC = () => {
                     onClick={() => setPaymentMethod(pm.id)}
                     className={`p-4 rounded-xl border text-left transition-colors cursor-pointer ${
                       paymentMethod === pm.id
-                        ? 'border-[#F0B90B] bg-[#F0B90B]/10'
+                        ? 'border-[#2E68FF] bg-[#2E68FF]/10'
                         : 'border-[var(--border-color)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)]'
                     }`}
                   >
@@ -179,7 +179,7 @@ export const BuyCryptoPage: React.FC = () => {
                       key={amt}
                       type="button"
                       onClick={() => setFiatAmount(amt.toString())}
-                      className="p-3 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B] text-left transition-colors cursor-pointer"
+                      className="p-3 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#2E68FF] text-left transition-colors cursor-pointer"
                     >
                       <div className="text-xs text-[var(--text-muted)]">
                         {fiatRates[fiatCurrency].symbol}
@@ -226,7 +226,7 @@ export const BuyCryptoPage: React.FC = () => {
 
               <form onSubmit={handleAction} className="p-6 space-y-5">
                 {/* Spend Input Box */}
-                <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B]">
+                <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF]">
                   <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-2">
                     <span>{side === 'Buy' ? 'You Spend' : 'You Receive (Est.)'}</span>
                     <span>Limit: 15 - 50,000 {fiatCurrency}</span>
@@ -270,7 +270,7 @@ export const BuyCryptoPage: React.FC = () => {
                     <select
                       value={cryptoAsset}
                       onChange={(e) => setCryptoAsset(e.target.value as any)}
-                      className="px-3 py-1.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs font-bold text-[#F0B90B] focus:outline-none cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs font-bold text-[#2E68FF] focus:outline-none cursor-pointer"
                     >
                       <option value="USDT">USDT</option>
                       <option value="BTC">BTC</option>
@@ -284,7 +284,7 @@ export const BuyCryptoPage: React.FC = () => {
                 {/* Recurring Buy Toggle */}
                 <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-[var(--bg-primary)]/60 border border-[var(--border-color)] text-xs">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-[#F0B90B]" />
+                    <Clock className="w-4 h-4 text-[#2E68FF]" />
                     <span className="text-[var(--text-secondary)]">Auto-Invest Recurring Plan</span>
                   </div>
                   <button
@@ -292,7 +292,7 @@ export const BuyCryptoPage: React.FC = () => {
                     onClick={() => setRecurringEnabled((p) => !p)}
                     className={`px-2.5 py-1 rounded text-[11px] font-semibold cursor-pointer ${
                       recurringEnabled
-                        ? 'bg-[#F0B90B] text-[#181A20]'
+                        ? 'bg-[#2E68FF] text-white'
                         : 'bg-[var(--bg-elevated)] text-[var(--text-muted)]'
                     }`}
                   >
@@ -306,7 +306,7 @@ export const BuyCryptoPage: React.FC = () => {
                     type="submit"
                     className={`w-full py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-95 cursor-pointer ${
                       side === 'Buy'
-                        ? 'bg-[#F0B90B] text-[#181A20]'
+                        ? 'bg-[#2E68FF] text-white'
                         : 'bg-[#F6465D] text-white'
                     }`}
                   >
@@ -316,7 +316,7 @@ export const BuyCryptoPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => openAuthModal('login')}
-                    className="w-full py-3.5 rounded-xl bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-sm transition-colors cursor-pointer"
+                    className="w-full py-3.5 rounded-xl bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-sm transition-colors cursor-pointer"
                   >
                     Log In / Sign Up to {side} {cryptoAsset}
                   </button>

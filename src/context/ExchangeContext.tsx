@@ -127,13 +127,13 @@ const ExchangeContext = createContext<ExchangeContextValue | null>(null);
 export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [route, setRoute] = useState<RoutePath>(parseCurrentPath);
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
-    const saved = localStorage.getItem('aetherx_theme');
+    const saved = localStorage.getItem('xah_theme') || localStorage.getItem('aetherx_theme');
     return saved === 'light' ? 'light' : 'dark';
   });
 
   const [favoriteSymbols, setFavoriteSymbols] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem('aetherx_favs');
+      const saved = localStorage.getItem('xah_favs') || localStorage.getItem('aetherx_favs');
       return saved ? JSON.parse(saved) : ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
     } catch {
       return ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT'];
@@ -147,7 +147,7 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLiveConnected, setIsLiveConnected] = useState<boolean>(false);
 
   const [sessionToken, setSessionToken] = useState<string | null>(() => {
-    return localStorage.getItem('aetherx_session_token');
+    return localStorage.getItem('xah_session_token') || localStorage.getItem('aetherx_session_token');
   });
   const [user, setUser] = useState<UserProfile | null>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
@@ -180,7 +180,7 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('aetherx_theme', theme);
+    localStorage.setItem('xah_theme', theme);
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
@@ -246,7 +246,7 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const next = prev.includes(symbol)
         ? prev.filter((s) => s !== symbol)
         : [...prev, symbol];
-      localStorage.setItem('aetherx_favs', JSON.stringify(next));
+      localStorage.setItem('xah_favs', JSON.stringify(next));
       return next;
     });
     setTickers((prev) =>
@@ -280,6 +280,7 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         ]);
 
         if (meRes.status === 401) {
+          localStorage.removeItem('xah_session_token');
           localStorage.removeItem('aetherx_session_token');
           setSessionToken(null);
           setUser(null);
@@ -361,7 +362,8 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           return false;
         }
 
-        localStorage.setItem('aetherx_session_token', data.token);
+        localStorage.setItem('xah_session_token', data.token);
+        localStorage.removeItem('aetherx_session_token');
         setSessionToken(data.token);
         setUser(data.user);
         setAuthModalOpen(false);
@@ -403,7 +405,8 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           return false;
         }
 
-        localStorage.setItem('aetherx_session_token', data.token);
+        localStorage.setItem('xah_session_token', data.token);
+        localStorage.removeItem('aetherx_session_token');
         setSessionToken(data.token);
         setUser(data.user);
         setAuthModalOpen(false);
@@ -434,6 +437,7 @@ export const ExchangeProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         headers: { Authorization: `Bearer ${sessionToken}` },
       }).catch(() => {});
     }
+    localStorage.removeItem('xah_session_token');
     localStorage.removeItem('aetherx_session_token');
     setSessionToken(null);
     setUser(null);

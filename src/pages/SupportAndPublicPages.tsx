@@ -38,7 +38,7 @@ export const NotificationsPage: React.FC = () => {
             onClick={markAllNotificationsRead}
             className="px-4 py-2 rounded-lg bg-[var(--bg-secondary)] hover:bg-[var(--bg-hover)] border border-[var(--border-color)] text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5 cursor-pointer"
           >
-            <CheckCheck className="w-4 h-4 text-[#F0B90B]" />
+            <CheckCheck className="w-4 h-4 text-[#2E68FF]" />
             Mark All as Read
           </button>
         </div>
@@ -50,7 +50,7 @@ export const NotificationsPage: React.FC = () => {
               onClick={() => setFilterCat(cat)}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                 filterCat === cat
-                  ? 'bg-[#F0B90B] text-[#181A20]'
+                  ? 'bg-[#2E68FF] text-white'
                   : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
               }`}
             >
@@ -68,13 +68,13 @@ export const NotificationsPage: React.FC = () => {
                 if (item.actionRoute) navigate(item.actionRoute);
               }}
               className={`p-5 flex items-start justify-between gap-4 hover:bg-[var(--bg-hover)] transition-colors cursor-pointer ${
-                !item.read ? 'bg-[#F0B90B]/5' : ''
+                !item.read ? 'bg-[#2E68FF]/5' : ''
               }`}
             >
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-xs">
-                  {!item.read && <span className="w-2 h-2 rounded-full bg-[#F0B90B]" />}
-                  <span className="font-bold text-[#F0B90B]">{item.category}</span>
+                  {!item.read && <span className="w-2 h-2 rounded-full bg-[#2E68FF]" />}
+                  <span className="font-bold text-[#2E68FF]">{item.category}</span>
                   <span className="text-[var(--text-muted)]">·</span>
                   <span className="text-[var(--text-muted)] font-mono-num">{item.timestamp}</span>
                 </div>
@@ -114,7 +114,7 @@ export const SupportPage: React.FC = () => {
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] py-8 px-4 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="space-y-2">
-          <div className="text-xs font-semibold text-[#F0B90B]">24/7 HELP & SUPPORT DESK</div>
+          <div className="text-xs font-semibold text-[#2E68FF]">24/7 HELP & SUPPORT DESK</div>
           <h1 className="font-display text-3xl font-bold text-[var(--text-primary)]">
             How Can We Help You Today?
           </h1>
@@ -150,7 +150,7 @@ export const SupportPage: React.FC = () => {
             <div
               key={card.title}
               onClick={() => navigate(card.path)}
-              className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#F0B90B] transition-colors cursor-pointer space-y-1.5"
+              className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[#2E68FF] transition-colors cursor-pointer space-y-1.5"
             >
               <div className="text-sm font-bold text-[var(--text-primary)]">{card.title}</div>
               <p className="text-xs text-[var(--text-muted)] leading-relaxed">{card.desc}</p>
@@ -190,12 +190,12 @@ export const SupportPage: React.FC = () => {
               value={ticketMessage}
               onChange={(e) => setTicketMessage(e.target.value)}
               placeholder="Describe your inquiry..."
-              className="w-full p-3.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+              className="w-full p-3.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#2E68FF]"
             />
           </div>
           <button
             type="submit"
-            className="px-6 py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold flex items-center gap-2 cursor-pointer"
+            className="px-6 py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold flex items-center gap-2 cursor-pointer"
           >
             <Send className="w-3.5 h-3.5" />
             Submit Ticket to 24/7 Desk
@@ -276,9 +276,9 @@ export const SitemapPage: React.FC = () => {
     <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] py-8 px-4 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="border-b border-[var(--border-color)] pb-4">
-          <div className="text-xs font-semibold text-[#F0B90B]">COMPLETE PLATFORM DIRECTORY</div>
+          <div className="text-xs font-semibold text-[#2E68FF]">COMPLETE PLATFORM DIRECTORY</div>
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mt-1">
-            AetherX Pro Exchange Sitemap
+            Binance Exchange Sitemap
           </h1>
           <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-1">
             Direct verified links to all 26 exchange modules and 16 live Spot/Futures trading pairs.
@@ -300,9 +300,9 @@ export const SitemapPage: React.FC = () => {
                   <button
                     key={r.path + r.name}
                     onClick={() => navigate(r.path)}
-                    className="w-full py-2.5 flex items-center justify-between text-xs hover:text-[#F0B90B] transition-colors cursor-pointer"
+                    className="w-full py-2.5 flex items-center justify-between text-xs hover:text-[#2E68FF] transition-colors cursor-pointer"
                   >
-                    <span className="font-semibold text-[var(--text-primary)] hover:text-[#F0B90B]">
+                    <span className="font-semibold text-[var(--text-primary)] hover:text-[#2E68FF]">
                       {r.name}{' '}
                       <span className="font-mono-num text-[var(--text-muted)] font-normal ml-1">
                         ({r.path})
@@ -310,7 +310,7 @@ export const SitemapPage: React.FC = () => {
                     </span>
                     <span
                       className={`text-[11px] font-mono-num ${
-                        r.access === 'Public' ? 'text-[#0ECB81]' : 'text-[#F0B90B]'
+                        r.access === 'Public' ? 'text-[#0ECB81]' : 'text-[#2E68FF]'
                       }`}
                     >
                       {r.access}
@@ -332,7 +332,7 @@ export const SitemapPage: React.FC = () => {
               <button
                 key={t.symbol}
                 onClick={() => navigate('/trade/spot', t.symbol)}
-                className="p-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#F0B90B] text-left transition-colors cursor-pointer"
+                className="p-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] hover:border-[#2E68FF] text-left transition-colors cursor-pointer"
               >
                 <div className="text-xs font-bold text-[var(--text-primary)]">
                   {t.baseAsset}/USDT
@@ -371,7 +371,7 @@ export const PublicInfoPage: React.FC<{
       <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] py-8 px-4 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div>
-            <div className="text-xs font-semibold text-[#F0B90B]">TRANSPARENT FEE SCHEDULE</div>
+            <div className="text-xs font-semibold text-[#2E68FF]">TRANSPARENT FEE SCHEDULE</div>
             <h1 className="font-display text-3xl font-bold text-[var(--text-primary)] mt-1">
               VIP & Trading Fee Rates
             </h1>
@@ -395,7 +395,7 @@ export const PublicInfoPage: React.FC<{
               <tbody className="divide-y divide-[var(--border-color)]/60 font-mono-num">
                 {tiers.map((t) => (
                   <tr key={t.tier} className="hover:bg-[var(--bg-hover)]">
-                    <td className="py-3.5 px-4 font-sans font-bold text-[#F0B90B]">{t.tier}</td>
+                    <td className="py-3.5 px-4 font-sans font-bold text-[#2E68FF]">{t.tier}</td>
                     <td className="py-3.5 px-4">{t.vol30d}</td>
                     <td className="py-3.5 px-4 text-right text-[#0ECB81]">{t.spotMaker}</td>
                     <td className="py-3.5 px-4 text-right">{t.spotTaker}</td>
@@ -467,7 +467,7 @@ export const PublicInfoPage: React.FC<{
               {
                 date: '2026-10-05',
                 tag: 'New Listing & Launchpool',
-                title: 'AetherX Pro Will List Hyperion ZK (HYPR) and Open HODLer Airdrop Claims',
+                title: 'Binance Will List Hyperion ZK (HYPR) and Open HODLer Airdrop Claims',
               },
               {
                 date: '2026-10-04',
@@ -491,7 +491,7 @@ export const PublicInfoPage: React.FC<{
                 className="p-5 flex items-center justify-between gap-4 hover:bg-[var(--bg-hover)] cursor-pointer"
               >
                 <div>
-                  <div className="text-xs text-[#F0B90B] font-semibold">
+                  <div className="text-xs text-[#2E68FF] font-semibold">
                     {a.tag} · <span className="font-mono-num text-[var(--text-muted)]">{a.date}</span>
                   </div>
                   <div className="text-sm font-bold text-[var(--text-primary)] mt-1">{a.title}</div>
@@ -515,10 +515,10 @@ export const PublicInfoPage: React.FC<{
           Low-latency market data streams and FIX/REST order execution endpoints for algorithmic traders.
         </p>
         <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] font-mono-num text-xs space-y-2">
-          <div className="text-[#0ECB81]">GET https://api.aetherx.io/api/v3/ticker/24hr</div>
-          <div className="text-[#F0B90B]">WSS wss://stream.aetherx.io:9443/ws/btcusdt@depth20@100ms</div>
+          <div className="text-[#0ECB81]">GET https://api.xah.exchange/api/v3/ticker/24hr</div>
+          <div className="text-[#2E68FF]">WSS wss://stream.xah.exchange:9443/ws/btcusdt@depth20@100ms</div>
           <div className="text-[var(--text-secondary)]">
-            POST https://api.aetherx.io/api/v3/order (HMAC-SHA256 / Ed25519 Signed)
+            POST https://api.xah.exchange/api/v3/order (HMAC-SHA256 / Ed25519 Signed)
           </div>
         </div>
       </div>

@@ -43,7 +43,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-primary)] text-[var(--text-primary)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#F0B90B]/15 text-[#F0B90B] flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-[#2E68FF]/15 text-[#2E68FF] flex items-center justify-center mx-auto">
             <Lock className="w-6 h-6" />
           </div>
           <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
@@ -54,7 +54,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
           </p>
           <button
             onClick={() => openAuthModal('login')}
-            className="w-full py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+            className="w-full py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
           >
             Log In / Register
           </button>
@@ -92,7 +92,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                 onClick={() => navigate(item.path)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                   active
-                    ? 'bg-[#F0B90B] text-[#181A20]'
+                    ? 'bg-[#2E68FF] text-white'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -110,7 +110,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
               {/* Profile Header Card */}
               <div className="p-6 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex flex-wrap items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#F0B90B] text-[#181A20] font-display font-bold text-lg flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-[#2E68FF] text-white font-display font-bold text-lg flex items-center justify-center">
                     {user.nickname.slice(0, 2).toUpperCase()}
                   </div>
                   <div>
@@ -126,7 +126,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => navigate('/wallet')}
-                    className="px-4 py-2 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold cursor-pointer"
+                    className="px-4 py-2 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold cursor-pointer"
                   >
                     View Portfolio (${totalUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
                   </button>
@@ -143,7 +143,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-1">
                   <div className="text-xs text-[var(--text-muted)]">Current Fee Tier</div>
-                  <div className="text-xl font-bold text-[#F0B90B]">{user.vipLevel}</div>
+                  <div className="text-xl font-bold text-[#2E68FF]">{user.vipLevel}</div>
                   <div className="text-xs text-[var(--text-secondary)] pt-1">
                     Spot Maker / Taker: <strong className="font-mono-num">0.08% / 0.10%</strong>
                   </div>
@@ -160,7 +160,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                 <div className="p-5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] space-y-1">
                   <div className="text-xs text-[var(--text-muted)]">Security Protection Score</div>
                   <div className="text-xl font-bold text-[#0ECB81]">
-                    {user.twoFactorEnabled && user.withdrawalWhitelist ? 'High (4/4)' : 'Medium (3/4)'}
+                    {user.twoFactorEnabled && user.withdrawalWhitelistEnabled ? 'High (4/4)' : 'Medium (3/4)'}
                   </div>
                   <div className="text-xs text-[var(--text-secondary)] pt-1">
                     Anti-Phishing: <strong className="font-mono-num">{user.antiPhishingCode}</strong>
@@ -184,7 +184,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                   {/* Authenticator App */}
                   <div className="py-4 flex items-center justify-between gap-4">
                     <div className="flex items-start gap-3">
-                      <Smartphone className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <Smartphone className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-bold text-[var(--text-primary)]">
                           Authenticator App (TOTP)
@@ -204,7 +204,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                       className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                         user.twoFactorEnabled
                           ? 'bg-[#0ECB81]/15 text-[#0ECB81]'
-                          : 'bg-[#F0B90B] text-[#181A20]'
+                          : 'bg-[#2E68FF] text-white'
                       }`}
                     >
                       {user.twoFactorEnabled ? 'Enabled (Toggle)' : 'Enable 2FA'}
@@ -229,17 +229,17 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                       onClick={async () => {
                         setSaving(true);
                         await updateUserProfile({
-                          withdrawalWhitelist: !user.withdrawalWhitelist,
+                          withdrawalWhitelistEnabled: !user.withdrawalWhitelistEnabled,
                         });
                         setSaving(false);
                       }}
                       className={`px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                        user.withdrawalWhitelist
+                        user.withdrawalWhitelistEnabled
                           ? 'bg-[#0ECB81]/15 text-[#0ECB81]'
                           : 'bg-[var(--bg-elevated)] border border-[var(--border-color)] text-[var(--text-primary)]'
                       }`}
                     >
-                      {user.withdrawalWhitelist ? 'Active (Disable)' : 'Activate Whitelist'}
+                      {user.withdrawalWhitelistEnabled ? 'Active (Disable)' : 'Activate Whitelist'}
                     </button>
                   </div>
 
@@ -250,7 +250,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                         Anti-Phishing Code
                       </div>
                       <div className="text-xs text-[var(--text-muted)]">
-                        All genuine emails from AetherX Pro will display this custom signature.
+                        All genuine emails from XAH Exchange will display this custom signature.
                       </div>
                     </div>
                     <form
@@ -267,12 +267,12 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                         type="text"
                         value={phishingInput}
                         onChange={(e) => setPhishingInput(e.target.value)}
-                        className="px-3 py-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+                        className="px-3 py-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-xs text-[var(--text-primary)] focus:outline-none focus:border-[#2E68FF]"
                       />
                       <button
                         type="submit"
                         disabled={saving}
-                        className="px-3.5 py-1.5 rounded-lg bg-[#F0B90B] text-[#181A20] text-xs font-bold cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-lg bg-[#2E68FF] text-white text-xs font-bold cursor-pointer"
                       >
                         Save Code
                       </button>
@@ -350,7 +350,7 @@ export const AccountHubPage: React.FC<AccountHubPageProps> = ({ section }) => {
                           description: `${kycDocType} (${kycCountry}) verified in database.`,
                         });
                       }}
-                      className="w-full py-2 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full py-2 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Upload className="w-3.5 h-3.5" />
                       Verify {kycDocType}

@@ -25,12 +25,12 @@ export const EarnPage: React.FC = () => {
     setActiveProduct(prod);
   };
 
-  const handleConfirmStake = (e: React.FormEvent) => {
+  const handleConfirmStake = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeProduct) return;
     const amt = parseFloat(stakeAmount) || 0;
     if (amt <= 0) return;
-    const ok = subscribeEarn(activeProduct.asset, amt, activeProduct.apr);
+    const ok = await subscribeEarn(activeProduct.asset, amt, activeProduct.apr);
     if (ok) {
       setActiveProduct(null);
     }
@@ -78,7 +78,7 @@ export const EarnPage: React.FC = () => {
                 onClick={() => setFilterTerm(t)}
                 className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                   filterTerm === t
-                    ? 'bg-[#F0B90B] text-[#181A20]'
+                    ? 'bg-[#2E68FF] text-white'
                     : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]'
                 }`}
               >
@@ -110,14 +110,14 @@ export const EarnPage: React.FC = () => {
                   <tr key={prod.id} className="hover:bg-[var(--bg-hover)] transition-colors">
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-color)] flex items-center justify-center font-bold text-[#F0B90B]">
+                        <div className="w-8 h-8 rounded-full bg-[var(--bg-elevated)] border border-[var(--border-color)] flex items-center justify-center font-bold text-[#2E68FF]">
                           {prod.asset.slice(0, 3)}
                         </div>
                         <div>
                           <div className="font-bold text-sm text-[var(--text-primary)]">
                             {prod.asset}{' '}
                             {prod.tag && (
-                              <span className="text-[11px] font-normal text-[#F0B90B] ml-1.5">
+                              <span className="text-[11px] font-normal text-[#2E68FF] ml-1.5">
                                 · {prod.tag}
                               </span>
                             )}
@@ -141,7 +141,7 @@ export const EarnPage: React.FC = () => {
                       <div className="w-32 bg-[var(--bg-primary)] h-2 rounded-full overflow-hidden border border-[var(--border-color)]">
                         <div
                           style={{ width: `${prod.totalSubscribedPercent}%` }}
-                          className="h-full bg-[#F0B90B]"
+                          className="h-full bg-[#2E68FF]"
                         />
                       </div>
                       <div className="text-[10px] font-mono-num text-[var(--text-muted)] mt-1">
@@ -151,7 +151,7 @@ export const EarnPage: React.FC = () => {
                     <td className="py-4 px-4 text-right">
                       <button
                         onClick={() => handleOpenSubscribe(prod)}
-                        className="px-4 py-2 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+                        className="px-4 py-2 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
                       >
                         Subscribe
                       </button>
@@ -202,7 +202,7 @@ export const EarnPage: React.FC = () => {
                   min={activeProduct.minAmount}
                   value={stakeAmount}
                   onChange={(e) => setStakeAmount(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#F0B90B]"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] font-mono-num text-sm text-[var(--text-primary)] focus:outline-none focus:border-[#2E68FF]"
                 />
               </div>
 
@@ -226,7 +226,7 @@ export const EarnPage: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold cursor-pointer"
+                  className="flex-1 py-2.5 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold cursor-pointer"
                 >
                   Confirm Stake
                 </button>

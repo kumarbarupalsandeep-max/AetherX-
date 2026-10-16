@@ -45,7 +45,7 @@ export const OrdersCenterPage: React.FC<OrdersCenterPageProps> = ({ initialTab }
     return (
       <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-primary)] text-[var(--text-primary)] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl p-8 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-[#F0B90B]/15 text-[#F0B90B] flex items-center justify-center mx-auto">
+          <div className="w-12 h-12 rounded-full bg-[#2E68FF]/15 text-[#2E68FF] flex items-center justify-center mx-auto">
             <Lock className="w-6 h-6" />
           </div>
           <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
@@ -56,7 +56,7 @@ export const OrdersCenterPage: React.FC<OrdersCenterPageProps> = ({ initialTab }
           </p>
           <button
             onClick={() => openAuthModal('login')}
-            className="w-full py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+            className="w-full py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
           >
             Log In
           </button>
@@ -75,7 +75,7 @@ export const OrdersCenterPage: React.FC<OrdersCenterPageProps> = ({ initialTab }
               onClick={() => navigate('/orders')}
               className={`pb-3 -mb-3.5 transition-colors cursor-pointer ${
                 initialTab === 'open'
-                  ? 'text-[#F0B90B] border-b-2 border-[#F0B90B]'
+                  ? 'text-[#2E68FF] border-b-2 border-[#2E68FF]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -85,7 +85,7 @@ export const OrdersCenterPage: React.FC<OrdersCenterPageProps> = ({ initialTab }
               onClick={() => navigate('/order-history')}
               className={`pb-3 -mb-3.5 transition-colors cursor-pointer ${
                 initialTab === 'history'
-                  ? 'text-[#F0B90B] border-b-2 border-[#F0B90B]'
+                  ? 'text-[#2E68FF] border-b-2 border-[#2E68FF]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -95,7 +95,7 @@ export const OrdersCenterPage: React.FC<OrdersCenterPageProps> = ({ initialTab }
               onClick={() => navigate('/trade-history')}
               className={`pb-3 -mb-3.5 transition-colors cursor-pointer ${
                 initialTab === 'trades'
-                  ? 'text-[#F0B90B] border-b-2 border-[#F0B90B]'
+                  ? 'text-[#2E68FF] border-b-2 border-[#2E68FF]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -178,7 +178,7 @@ export const OrdersCenterPage: React.FC<OrdersCenterPageProps> = ({ initialTab }
                         No open orders match your filter.{' '}
                         <button
                           onClick={() => navigate('/trade/spot')}
-                          className="text-[#F0B90B] font-semibold hover:underline ml-1 cursor-pointer"
+                          className="text-[#2E68FF] font-semibold hover:underline ml-1 cursor-pointer"
                         >
                           Go to Spot Terminal
                         </button>
@@ -275,7 +275,7 @@ export const OrdersCenterPage: React.FC<OrdersCenterPageProps> = ({ initialTab }
                           ord.status === 'Filled'
                             ? 'text-[#0ECB81]'
                             : ord.status === 'Open'
-                            ? 'text-[#F0B90B]'
+                            ? 'text-[#2E68FF]'
                             : 'text-[var(--text-muted)]'
                         }`}
                       >

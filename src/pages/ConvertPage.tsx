@@ -56,7 +56,7 @@ export const ConvertPage: React.FC = () => {
             ZERO TRADING FEES · GUARANTEED INSTITUTIONAL QUOTE
           </div>
           <h1 className="font-display text-3xl font-bold text-[var(--text-primary)]">
-            AetherX Convert & Block Portal
+            Binance Convert & Block Portal
           </h1>
           <p className="text-xs sm:text-sm text-[var(--text-muted)]">
             Swap between any supported digital assets in one click with zero slippage and instant settlement.
@@ -75,7 +75,7 @@ export const ConvertPage: React.FC = () => {
                   onClick={() => setMode(m)}
                   className={`text-xs font-bold pb-2 -mb-3.5 border-b-2 transition-colors cursor-pointer ${
                     mode === m
-                      ? 'border-[#F0B90B] text-[#F0B90B]'
+                      ? 'border-[#2E68FF] text-[#2E68FF]'
                       : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
@@ -85,7 +85,7 @@ export const ConvertPage: React.FC = () => {
             </div>
             <button
               onClick={() => navigate('/trade-history')}
-              className="text-xs text-[var(--text-muted)] hover:text-[#F0B90B] cursor-pointer"
+              className="text-xs text-[var(--text-muted)] hover:text-[#2E68FF] cursor-pointer"
             >
               Convert History
             </button>
@@ -93,7 +93,7 @@ export const ConvertPage: React.FC = () => {
 
           <form onSubmit={handleExecuteConvert} className="space-y-3">
             {/* From Box */}
-            <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#F0B90B]">
+            <div className="p-4 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-color)] focus-within:border-[#2E68FF]">
               <div className="flex items-center justify-between text-xs text-[var(--text-muted)] mb-2">
                 <span>From</span>
                 <span>
@@ -104,7 +104,7 @@ export const ConvertPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setFromAmount(availableFromBalance.toString())}
-                    className="ml-2 text-[#F0B90B] font-semibold hover:underline cursor-pointer"
+                    className="ml-2 text-[#2E68FF] font-semibold hover:underline cursor-pointer"
                   >
                     MAX
                   </button>
@@ -139,7 +139,7 @@ export const ConvertPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleSwapDirection}
-                className="p-2.5 rounded-full bg-[var(--bg-elevated)] hover:bg-[#F0B90B] hover:text-[#181A20] border border-[var(--border-color)] text-[var(--text-primary)] transition-colors cursor-pointer"
+                className="p-2.5 rounded-full bg-[var(--bg-elevated)] hover:bg-[#2E68FF] hover:text-white border border-[var(--border-color)] text-[var(--text-primary)] transition-colors cursor-pointer"
                 title="Reverse Pair"
               >
                 <ArrowDownUp className="w-4 h-4" />
@@ -163,7 +163,7 @@ export const ConvertPage: React.FC = () => {
                 <select
                   value={toAsset}
                   onChange={(e) => setToAsset(e.target.value)}
-                  className="px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs font-bold text-[#F0B90B] focus:outline-none cursor-pointer"
+                  className="px-3 py-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] text-xs font-bold text-[#2E68FF] focus:outline-none cursor-pointer"
                 >
                   {assets
                     .filter((a) => a !== fromAsset)
@@ -182,7 +182,7 @@ export const ConvertPage: React.FC = () => {
                 <span className="text-[var(--text-muted)]">Exchange Rate</span>
                 <span className="font-mono-num text-[var(--text-primary)] flex items-center gap-1.5">
                   1 {fromAsset} = {conversionRate < 0.01 ? conversionRate.toFixed(7) : conversionRate.toFixed(4)} {toAsset}
-                  <RefreshCw className="w-3 h-3 text-[#F0B90B]" />
+                  <RefreshCw className="w-3 h-3 text-[#2E68FF]" />
                 </span>
               </div>
               <div className="flex justify-between">
@@ -200,7 +200,7 @@ export const ConvertPage: React.FC = () => {
             {isAuthenticated ? (
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-sm transition-colors cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-sm transition-colors cursor-pointer"
               >
                 Convert {fromAsset} to {toAsset} Instantly
               </button>
@@ -208,7 +208,7 @@ export const ConvertPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => openAuthModal('login')}
-                className="w-full py-3.5 rounded-xl bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-sm transition-colors cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-sm transition-colors cursor-pointer"
               >
                 Log In to Convert Crypto
               </button>

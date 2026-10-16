@@ -11,6 +11,7 @@ import {
 import { useExchange } from '../context/ExchangeContext';
 import { formatPrice, formatCompactNumber } from '../data/exchangeData';
 import { CryptoIcon } from '../components/CryptoIcon';
+import { Sparkline } from '../components/Sparkline';
 
 export const MarketsPage: React.FC = () => {
   const { tickers, marketLoading, marketError, refreshMarkets, navigate, toggleFavoritePair } =
@@ -94,6 +95,7 @@ export const MarketsPage: React.FC = () => {
                   {item.baseAsset}
                 </span>
               </div>
+              <Sparkline changePercent={item.priceChangePercent} width={56} height={20} />
               <span className="text-xs font-mono-num text-[var(--text-primary)]">
                 ${formatPrice(item.price)}
               </span>
@@ -120,7 +122,7 @@ export const MarketsPage: React.FC = () => {
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
             Markets Overview
           </h1>
-          <div className="flex items-center gap-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] focus-within:border-[#F0B90B] rounded-xl px-3.5 py-2 w-full sm:w-80">
+          <div className="flex items-center gap-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] focus-within:border-[#2E68FF] rounded-xl px-3.5 py-2 w-full sm:w-80">
             <Search className="w-4 h-4 text-[var(--text-muted)]" />
             <input
               type="text"
@@ -156,7 +158,7 @@ export const MarketsPage: React.FC = () => {
               onClick={() => setMarketSubTab(t.id)}
               className={`pb-3 transition-colors whitespace-nowrap cursor-pointer ${
                 marketSubTab === t.id
-                  ? 'text-[var(--text-primary)] border-b-2 border-[#F0B90B]'
+                  ? 'text-[var(--text-primary)] border-b-2 border-[#2E68FF]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -173,7 +175,7 @@ export const MarketsPage: React.FC = () => {
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-[var(--bg-hover)] text-[#F0B90B]'
+                  ? 'bg-[var(--bg-hover)] text-[#2E68FF]'
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -228,23 +230,24 @@ export const MarketsPage: React.FC = () => {
                       Market Cap <ArrowUpDown className="w-3 h-3" />
                     </button>
                   </th>
+                  <th className="py-3 px-4 text-center hidden md:table-cell">7D Chart</th>
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border-color)]/60 text-xs">
                 {marketLoading && tickers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-[var(--text-muted)]">
+                    <td colSpan={7} className="py-12 text-center text-[var(--text-muted)]">
                       Loading live market tickers from upstream provider...
                     </td>
                   </tr>
                 ) : marketError && tickers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center space-y-3">
+                    <td colSpan={7} className="py-12 text-center space-y-3">
                       <div className="text-[#F6465D] font-bold">{marketError}</div>
                       <button
                         onClick={refreshMarkets}
-                        className="px-4 py-2 rounded-lg bg-[#F0B90B] text-[#181A20] text-xs font-bold cursor-pointer"
+                        className="px-4 py-2 rounded-lg bg-[#2E68FF] text-white text-xs font-bold cursor-pointer"
                       >
                         Retry Live Connection
                       </button>
@@ -252,7 +255,7 @@ export const MarketsPage: React.FC = () => {
                   </tr>
                 ) : filteredTickers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-[var(--text-muted)]">
+                    <td colSpan={7} className="py-12 text-center text-[var(--text-muted)]">
                       No trading pairs match "{search}".
                     </td>
                   </tr>
@@ -278,12 +281,12 @@ export const MarketsPage: React.FC = () => {
                                 e.stopPropagation();
                                 toggleFavoritePair(t.symbol);
                               }}
-                              className="text-[var(--text-muted)] hover:text-[#F0B90B]"
+                              className="text-[var(--text-muted)] hover:text-[#2E68FF]"
                               aria-label="Toggle favorite"
                             >
                               <Star
                                 className={`w-4 h-4 ${
-                                  t.isFavorite ? 'fill-[#F0B90B] text-[#F0B90B]' : ''
+                                  t.isFavorite ? 'fill-[#2E68FF] text-[#2E68FF]' : ''
                                 }`}
                               />
                             </button>
@@ -313,6 +316,11 @@ export const MarketsPage: React.FC = () => {
                         <td className="py-3.5 px-4 text-right font-mono-num text-[var(--text-secondary)] hidden lg:table-cell">
                           ${formatCompactNumber(t.marketCap)}
                         </td>
+                        <td className="py-3.5 px-4 text-center hidden md:table-cell">
+                          <div className="flex justify-center">
+                            <Sparkline changePercent={t.priceChangePercent} width={84} height={24} />
+                          </div>
+                        </td>
                         <td className="py-3.5 px-4 text-right">
                           <div className="inline-flex items-center gap-3">
                             <button
@@ -321,7 +329,7 @@ export const MarketsPage: React.FC = () => {
                                 e.stopPropagation();
                                 navigate('/convert');
                               }}
-                              className="text-xs text-[#F0B90B] hover:underline font-semibold"
+                              className="text-xs text-[#2E68FF] hover:underline font-semibold"
                             >
                               Convert
                             </button>
@@ -331,7 +339,7 @@ export const MarketsPage: React.FC = () => {
                                 e.stopPropagation();
                                 navigate('/trade/spot', t.symbol);
                               }}
-                              className="text-xs text-[#F0B90B] hover:underline font-semibold"
+                              className="text-xs text-[#2E68FF] hover:underline font-semibold"
                             >
                               Trade
                             </button>

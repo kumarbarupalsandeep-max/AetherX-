@@ -11,7 +11,7 @@ export const AirdropPage: React.FC = () => {
         {/* Hero */}
         <div className="p-6 sm:p-8 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="text-xs font-semibold text-[#F0B90B]">
+            <div className="text-xs font-semibold text-[#2E68FF]">
               MEGADROP & HODLER AIRDROP PORTAL
             </div>
             <h1 className="font-display text-2xl sm:text-4xl font-bold text-[var(--text-primary)]">
@@ -24,7 +24,7 @@ export const AirdropPage: React.FC = () => {
           <div className="flex gap-3">
             <button
               onClick={() => navigate('/earn')}
-              className="px-5 py-3 rounded-xl bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] font-bold text-xs cursor-pointer"
+              className="px-5 py-3 rounded-xl bg-[#2E68FF] hover:bg-[#1D4ED8] text-white font-bold text-xs cursor-pointer"
             >
               Subscribe Simple Earn
             </button>
@@ -58,7 +58,7 @@ export const AirdropPage: React.FC = () => {
                       {camp.snapshotAsset})
                     </span>
                     <span className="text-[var(--text-muted)]">·</span>
-                    <span className="font-mono-num text-[#F0B90B]">Ends in: {camp.endsIn}</span>
+                    <span className="font-mono-num text-[#2E68FF]">Ends in: {camp.endsIn}</span>
                   </div>
 
                   <h3 className="text-lg font-bold text-[var(--text-primary)]">
@@ -95,7 +95,7 @@ export const AirdropPage: React.FC = () => {
                   ) : (
                     <button
                       onClick={() => claimAirdrop(camp.id)}
-                      className="px-6 py-3 rounded-lg bg-[#F0B90B] hover:bg-[#FCD535] text-[#181A20] text-xs font-bold cursor-pointer"
+                      className="px-6 py-3 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold cursor-pointer"
                     >
                       Claim {camp.estimatedAllocation}
                     </button>

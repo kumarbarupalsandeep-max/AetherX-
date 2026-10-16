@@ -32,6 +32,7 @@ import { useExchange } from '../context/ExchangeContext';
 import { RoutePath } from '../types/exchange';
 import { formatPrice } from '../data/exchangeData';
 import { CryptoIcon } from './CryptoIcon';
+import { Logo } from './Logo';
 
 export const Navbar: React.FC = () => {
   const {
@@ -85,8 +86,8 @@ export const Navbar: React.FC = () => {
   const navLinkClass = (active: boolean) =>
     `px-2.5 py-2 text-[14px] font-medium transition-colors whitespace-nowrap flex items-center gap-1 cursor-pointer ${
       active
-        ? 'text-[#F0B90B]'
-        : 'text-[var(--text-primary)] hover:text-[#F0B90B]'
+        ? 'text-[#2E68FF]'
+        : 'text-[var(--text-primary)] hover:text-[#2E68FF]'
     }`;
 
   return (
@@ -100,12 +101,9 @@ export const Navbar: React.FC = () => {
               e.preventDefault();
               navigate('/');
             }}
-            className="font-display text-[20px] font-extrabold tracking-tight text-[#F0B90B] flex items-center gap-2 shrink-0"
+            className="flex items-center cursor-pointer"
           >
-            <svg className="w-6 h-6 fill-[#F0B90B]" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 2L15.8 5.8L12 9.6L8.2 5.8L12 2ZM5.8 8.2L9.6 12L5.8 15.8L2 12L5.8 8.2ZM18.2 8.2L22 12L18.2 15.8L14.4 12L18.2 8.2ZM12 14.4L15.8 18.2L12 22L8.2 18.2L12 14.4ZM12 9.8L14.2 12L12 14.2L9.8 12L12 9.8Z" />
-            </svg>
-            AETHERX
+            <Logo size="md" />
           </a>
 
           {/* Primary Exchange Navigation */}
@@ -128,13 +126,13 @@ export const Navbar: React.FC = () => {
                   <div className="bg-[var(--bg-elevated)] border border-[var(--border-color)] rounded-xl shadow-2xl p-2.5 space-y-1">
                     <div className="px-2.5 py-1 text-[11px] font-semibold text-[var(--text-muted)] flex items-center justify-between">
                       <span>Pay with</span>
-                      <span className="text-[#F0B90B]">USD · EUR · INR · GBP</span>
+                      <span className="text-[#2E68FF]">USD · EUR · INR · GBP</span>
                     </div>
                     <button
                       onClick={() => navigate('/buy-crypto')}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                     >
-                      <CreditCard className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <CreditCard className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-primary)]">
                           Quick Buy & Sell (Card / Apple Pay)
@@ -162,7 +160,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => navigate('/deposit')}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                     >
-                      <Wallet className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <Wallet className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-primary)]">
                           Crypto Deposit
@@ -211,7 +209,7 @@ export const Navbar: React.FC = () => {
                         onClick={() => navigate('/trade/spot')}
                         className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                       >
-                        <TrendingUp className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                        <TrendingUp className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                         <div>
                           <div className="text-sm font-semibold text-[var(--text-primary)]">
                             Spot
@@ -239,7 +237,7 @@ export const Navbar: React.FC = () => {
                         onClick={() => navigate('/p2p')}
                         className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                       >
-                        <Users className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                        <Users className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                         <div>
                           <div className="text-sm font-semibold text-[var(--text-primary)]">
                             P2P
@@ -259,7 +257,7 @@ export const Navbar: React.FC = () => {
                         onClick={() => navigate('/trade/spot')}
                         className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                       >
-                        <Bot className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                        <Bot className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                         <div>
                           <div className="text-sm font-semibold text-[var(--text-primary)]">
                             Spot Margin & Grid Bots
@@ -323,7 +321,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => navigate('/trade/futures')}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                     >
-                      <Coins className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <Coins className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-primary)]">
                           COIN-M Futures
@@ -358,7 +356,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => navigate('/earn')}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                     >
-                      <Layers className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <Layers className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-primary)]">
                           Simple Earn
@@ -407,7 +405,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => navigate('/announcements')}
                       className="w-full flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                     >
-                      <FileText className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <FileText className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-primary)]">
                           News & Announcements
@@ -458,7 +456,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => navigate('/airdrop')}
                       className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                     >
-                      <Gift className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <Gift className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-primary)]">
                           Megadrop & Airdrop Portal
@@ -500,7 +498,7 @@ export const Navbar: React.FC = () => {
                       onClick={() => navigate('/fees')}
                       className="flex items-start gap-3 p-2.5 rounded-lg hover:bg-[var(--bg-hover)] text-left transition-colors cursor-pointer"
                     >
-                      <Award className="w-5 h-5 text-[#F0B90B] shrink-0 mt-0.5" />
+                      <Award className="w-5 h-5 text-[#2E68FF] shrink-0 mt-0.5" />
                       <div>
                         <div className="text-sm font-semibold text-[var(--text-primary)]">
                           VIP & Institutional Fees
@@ -551,7 +549,7 @@ export const Navbar: React.FC = () => {
           <div className="relative">
             <button
               onClick={() => setSearchOpen((prev) => !prev)}
-              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#F0B90B] hover:bg-[var(--bg-hover)] transition-colors flex items-center gap-2 cursor-pointer"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#2E68FF] hover:bg-[var(--bg-hover)] transition-colors flex items-center gap-2 cursor-pointer"
               title="Search Markets & Functions"
             >
               <Search className="w-4 h-4" />
@@ -561,8 +559,8 @@ export const Navbar: React.FC = () => {
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setSearchOpen(false)} />
                 <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-[var(--bg-elevated)] border border-[var(--border-color)] rounded-xl shadow-2xl p-3.5 z-50">
-                  <div className="flex items-center gap-2 bg-[var(--bg-primary)] border border-[#F0B90B] rounded-lg px-3 py-2 mb-3">
-                    <Search className="w-4 h-4 text-[#F0B90B]" />
+                  <div className="flex items-center gap-2 bg-[var(--bg-primary)] border border-[#2E68FF] rounded-lg px-3 py-2 mb-3">
+                    <Search className="w-4 h-4 text-[#2E68FF]" />
                     <input
                       type="text"
                       value={searchQuery}
@@ -651,7 +649,7 @@ export const Navbar: React.FC = () => {
           {/* Deposit Action Button */}
           <button
             onClick={() => navigate('/deposit')}
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"
           >
             Deposit
           </button>
@@ -753,7 +751,7 @@ export const Navbar: React.FC = () => {
               >
                 <button
                   onClick={() => navigate('/account')}
-                  className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#F0B90B] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+                  className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#2E68FF] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
                   title="Account Center"
                 >
                   <User className="w-4 h-4" />
@@ -817,7 +815,7 @@ export const Navbar: React.FC = () => {
               </button>
               <button
                 onClick={() => openAuthModal('register')}
-                className="px-3.5 py-1.5 rounded-lg bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"
+                className="px-3.5 py-1.5 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-colors whitespace-nowrap cursor-pointer"
               >
                 Sign Up
               </button>
@@ -831,7 +829,7 @@ export const Navbar: React.FC = () => {
             onMouseLeave={handleMouseLeave}
           >
             <button
-              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#F0B90B] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#2E68FF] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
               title="Download iOS / Android & Desktop App"
             >
               <Download className="w-4 h-4" />
@@ -856,19 +854,19 @@ export const Navbar: React.FC = () => {
           {/* Notifications Bell */}
           <button
             onClick={() => navigate('/notifications')}
-            className="relative p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#F0B90B] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+            className="relative p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#2E68FF] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#F0B90B]" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#2E68FF]" />
             )}
           </button>
 
           {/* Language & Currency Selector */}
           <button
             onClick={() => setCurrencyModalOpen(true)}
-            className="hidden xl:flex p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#F0B90B] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+            className="hidden xl:flex p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#2E68FF] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
             title="Language and Currency"
           >
             <Globe className="w-4 h-4" />
@@ -877,12 +875,12 @@ export const Navbar: React.FC = () => {
           {/* Dark / White Theme Switcher */}
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#F0B90B] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[#2E68FF] hover:bg-[var(--bg-hover)] transition-colors cursor-pointer"
             title={theme === 'dark' ? 'Switch to White Mode' : 'Switch to Dark Mode'}
             aria-label="Toggle color theme"
           >
             {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-[#F0B90B]" />
+              <Sun className="w-4 h-4 text-[#2E68FF]" />
             ) : (
               <Moon className="w-4 h-4" />
             )}
@@ -918,7 +916,7 @@ export const Navbar: React.FC = () => {
                       setMobileMenuOpen(false);
                       openAuthModal('register');
                     }}
-                    className="py-2.5 rounded-lg bg-[#FCD535] text-[#181A20] text-xs font-bold"
+                    className="py-2.5 rounded-lg bg-[#2E68FF] text-white text-xs font-bold"
                   >
                     Sign Up
                   </button>
@@ -926,9 +924,9 @@ export const Navbar: React.FC = () => {
               ) : (
                 <div className="p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] flex items-center justify-between">
                   <div>
-                    <div className="text-xs font-bold text-[var(--text-primary)]">{user.email}</div>
+                    <div className="text-xs font-bold text-[var(--text-primary)]">{user?.email || 'User'}</div>
                     <div className="text-[11px] text-[#0ECB81]">
-                      UID: {user.uid} · {user.vipLevel}
+                      UID: {user?.uid || '—'} · {user?.vipLevel || 'VIP 0'}
                     </div>
                   </div>
                   <button
@@ -972,7 +970,7 @@ export const Navbar: React.FC = () => {
                     onClick={() => navigate(item.path)}
                     className={`flex items-center justify-between p-3 rounded-lg border text-left text-xs font-semibold ${
                       route === item.path
-                        ? 'border-[#F0B90B] bg-[#F0B90B]/10 text-[#F0B90B]'
+                        ? 'border-[#2E68FF] bg-[#2E68FF]/10 text-[#2E68FF]'
                         : 'border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)]'
                     }`}
                   >
@@ -1011,7 +1009,7 @@ export const Navbar: React.FC = () => {
                     onClick={() => setSelectedLang(lang)}
                     className={`p-2.5 rounded-lg text-xs font-semibold border text-left cursor-pointer ${
                       selectedLang === lang
-                        ? 'border-[#F0B90B] text-[#F0B90B] bg-[#F0B90B]/10'
+                        ? 'border-[#2E68FF] text-[#2E68FF] bg-[#2E68FF]/10'
                         : 'border-[var(--border-color)] text-[var(--text-primary)]'
                     }`}
                   >
@@ -1030,7 +1028,7 @@ export const Navbar: React.FC = () => {
                     onClick={() => setSelectedCurrency(curr)}
                     className={`p-2.5 rounded-lg text-xs font-semibold border text-left cursor-pointer ${
                       selectedCurrency === curr
-                        ? 'border-[#F0B90B] text-[#F0B90B] bg-[#F0B90B]/10'
+                        ? 'border-[#2E68FF] text-[#2E68FF] bg-[#2E68FF]/10'
                         : 'border-[var(--border-color)] text-[var(--text-primary)]'
                     }`}
                   >
@@ -1049,7 +1047,7 @@ export const Navbar: React.FC = () => {
                   description: `${selectedLang} · ${selectedCurrency}`,
                 });
               }}
-              className="w-full py-2.5 rounded-lg bg-[#FCD535] hover:bg-[#F0B90B] text-[#181A20] text-xs font-bold cursor-pointer"
+              className="w-full py-2.5 rounded-lg bg-[#2E68FF] hover:bg-[#1D4ED8] text-white text-xs font-bold cursor-pointer"
             >
               Save Preferences
             </button>

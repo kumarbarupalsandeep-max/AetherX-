@@ -2,6 +2,7 @@ import React from 'react';
 import { Sun, Moon, Globe } from 'lucide-react';
 import { useExchange } from '../context/ExchangeContext';
 import { RoutePath } from '../types/exchange';
+import { Logo } from './Logo';
 
 export const Footer: React.FC = () => {
   const { navigate, route, theme, toggleTheme } = useExchange();
@@ -100,11 +101,8 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8 pb-10 border-b border-[var(--border-color)]">
           {/* Column 1: Community & Language/Theme Controls */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
-            <div className="font-display text-lg font-extrabold tracking-tight text-[#F0B90B] flex items-center gap-2">
-              <svg className="w-5 h-5 fill-[#F0B90B]" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2L15.8 5.8L12 9.6L8.2 5.8L12 2ZM5.8 8.2L9.6 12L5.8 15.8L2 12L5.8 8.2ZM18.2 8.2L22 12L18.2 15.8L14.4 12L18.2 8.2ZM12 14.4L15.8 18.2L12 22L8.2 18.2L12 14.4ZM12 9.8L14.2 12L12 14.2L9.8 12L12 9.8Z" />
-              </svg>
-              AETHERX
+            <div className="pb-1">
+              <Logo size="md" />
             </div>
 
             <div className="text-xs font-bold text-[var(--text-primary)]">Community</div>
@@ -113,7 +111,7 @@ export const Footer: React.FC = () => {
                 <button
                   key={soc}
                   onClick={() => navigate('/announcements')}
-                  className="w-7 h-7 rounded-full bg-[var(--bg-elevated)] hover:bg-[#F0B90B] hover:text-[#181A20] border border-[var(--border-color)] flex items-center justify-center font-bold transition-colors cursor-pointer"
+                  className="w-7 h-7 rounded-full bg-[var(--bg-elevated)] hover:bg-[#2E68FF] hover:text-white border border-[var(--border-color)] flex items-center justify-center font-bold transition-colors cursor-pointer"
                 >
                   {soc}
                 </button>
@@ -133,7 +131,7 @@ export const Footer: React.FC = () => {
                 >
                   {theme === 'dark' ? (
                     <>
-                      <Sun className="w-3.5 h-3.5 text-[#F0B90B]" /> Dark
+                      <Sun className="w-3.5 h-3.5 text-[#2E68FF]" /> Dark
                     </>
                   ) : (
                     <>
@@ -158,7 +156,7 @@ export const Footer: React.FC = () => {
                         e.preventDefault();
                         navigate(link.path);
                       }}
-                      className="text-xs text-[var(--text-muted)] hover:text-[#F0B90B] transition-colors"
+                      className="text-xs text-[var(--text-muted)] hover:text-[#2E68FF] transition-colors"
                     >
                       {link.label}
                     </a>
@@ -170,7 +168,7 @@ export const Footer: React.FC = () => {
         </div>
 
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
-          <div>AetherX © {new Date().getFullYear()} All Rights Reserved</div>
+          <div>Binance.com © 2017 - {new Date().getFullYear()} All Rights Reserved</div>
           <div className="flex flex-wrap items-center gap-4">
             <button onClick={() => navigate('/proof-of-reserves')} className="hover:text-[var(--text-primary)] cursor-pointer">
               Cookie Preferences
