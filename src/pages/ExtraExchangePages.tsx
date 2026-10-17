@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Activity, ArrowDownLeft, ArrowUpRight, KeyRound, Plus, Search, ShieldCheck, Smartphone, Copy, Trash2, ExternalLink, Clock3, CircleAlert } from 'lucide-react';
+import { Activity, ArrowDownLeft, ArrowUpRight, Plus, Search, ShieldCheck, Smartphone, Trash2, Clock3, CircleAlert } from 'lucide-react';
 import { useExchange } from '../context/ExchangeContext';
 
 const PageShell: React.FC<{ eyebrow: string; title: string; description: string; children: React.ReactNode }> = ({ eyebrow, title, description, children }) => (
