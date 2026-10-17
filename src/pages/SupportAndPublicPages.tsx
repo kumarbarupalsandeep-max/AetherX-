@@ -222,6 +222,7 @@ export const SitemapPage: React.FC = () => {
         { name: 'Markets Overview', path: '/markets', access: 'Public' },
         { name: 'Spot Trading Terminal', path: '/trade/spot', access: 'Public' },
         { name: 'USDⓈ-M Perpetual Futures (125x)', path: '/trade/futures', access: 'Public' },
+        { name: 'Futures Positions', path: '/futures-positions', access: 'Login Gated' },
         { name: 'Zero-Fee Convert & OTC', path: '/convert', access: 'Public' },
       ],
     },
@@ -231,6 +232,7 @@ export const SitemapPage: React.FC = () => {
       routes: [
         { name: 'Buy & Sell Crypto (Card / Bank)', path: '/buy-crypto', access: 'Public' },
         { name: 'P2P Marketplace (0% Fee)', path: '/p2p', access: 'Public' },
+        { name: 'My P2P Orders', path: '/p2p-orders', access: 'Login Gated' },
       ],
     },
     {
@@ -252,6 +254,7 @@ export const SitemapPage: React.FC = () => {
         { name: 'Open Spot & Futures Orders', path: '/orders', access: 'Login Gated' },
         { name: 'Order History', path: '/order-history', access: 'Login Gated' },
         { name: 'Trade Execution History', path: '/trade-history', access: 'Login Gated' },
+        { name: 'Transaction History', path: '/transaction-history', access: 'Login Gated' },
       ],
     },
     {
@@ -260,6 +263,8 @@ export const SitemapPage: React.FC = () => {
       routes: [
         { name: 'Account Dashboard', path: '/account', access: 'Login Gated' },
         { name: 'Security & 2FA Settings', path: '/security', access: 'Login Gated' },
+        { name: 'Login & Device Activity', path: '/login-activity', access: 'Login Gated' },
+        { name: 'API Key Management', path: '/api-keys', access: 'Login Gated' },
         { name: 'Identity Verification (KYC)', path: '/kyc', access: 'Login Gated' },
         { name: 'Notification Center', path: '/notifications', access: 'Public' },
         { name: '24/7 Support Center', path: '/support', access: 'Public' },
