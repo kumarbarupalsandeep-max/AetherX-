@@ -24,6 +24,7 @@ import { EarnPage } from './pages/EarnPage';
 import { AirdropPage } from './pages/AirdropPage';
 import { ReferralPage } from './pages/ReferralPage';
 import { AccountHubPage } from './pages/AccountHubPage';
+import { FuturesPositionsPage, ApiKeyManagementPage, LoginActivityPage, TransactionHistoryPage, P2POrdersPage } from './pages/ExtraExchangePages';
 import {
   NotificationsPage,
   SupportPage,
@@ -44,6 +45,16 @@ const ExchangeRouter: React.FC = () => {
         return <TradingTerminalPage marketMode="Spot" />;
       case '/trade/futures':
         return <TradingTerminalPage marketMode="Futures" />;
+      case '/futures-positions':
+        return <FuturesPositionsPage />;
+      case '/api-keys':
+        return <ApiKeyManagementPage />;
+      case '/login-activity':
+        return <LoginActivityPage />;
+      case '/transaction-history':
+        return <TransactionHistoryPage />;
+      case '/p2p-orders':
+        return <P2POrdersPage />;
       case '/buy-crypto':
         return <BuyCryptoPage />;
       case '/convert':
